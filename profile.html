@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Tracker — Профиль</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <h2>🐾 Pet Tracker</h2>
+        <nav class="menu">
+            <a href="index.html">Главная</a>
+            <a href="pets.html">Питомцы</a>
+            <a href="calendar.html">Календарь</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <section id="profileCard"></section>
+
+        <section class="panel">
+            <div class="section-head">
+                <h2>История веса</h2>
+                <button class="btn" onclick="openWeightModal()">+ Добавить вес</button>
+            </div>
+
+            <ul id="weightList" class="record-list"></ul>
+        </section>
+
+        <section class="panel">
+            <h2>График веса</h2>
+            <canvas id="weightChart" height="120"></canvas>
+        </section>
+    </main>
+</div>
+
+<!-- МОДАЛКА ПИТОМЦА -->
+<div id="petModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-top">
+            <h3 id="petModalTitle">Редактировать питомца</h3>
+            <button class="icon-btn" onclick="closePetModal()">✕</button>
+        </div>
+
+        <input type="hidden" id="petIndex">
+
+        <input id="petName" type="text" placeholder="Имя питомца">
+        <input id="petSpecies" type="text" placeholder="Вид животного">
+        <select id="petGender">
+            <option value="">Пол</option>
+            <option value="Самец">Самец</option>
+            <option value="Самка">Самка</option>
+        </select>
+        <input id="petBirthDate" type="date">
+        <select id="petHousing">
+            <option value="">Где живёт</option>
+            <option value="Квартира">Квартира</option>
+            <option value="Свободный выгул">Свободный выгул</option>
+            <option value="Террариум">Террариум</option>
+        </select>
+
+        <div class="photo-box">
+            <img id="petPhotoPreview" alt="Фото питомца">
+        </div>
+
+        <input id="petPhoto" type="file" accept="image/*">
+
+        <div class="modal-actions">
+            <button class="btn" onclick="savePet()">Сохранить</button>
+            <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА ВЕСА -->
+<div id="weightModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-top">
+            <h3 id="weightModalTitle">Добавить вес</h3>
+            <button class="icon-btn" onclick="closeWeightModal()">✕</button>
+        </div>
+
+        <input type="hidden" id="weightIndex">
+        <input id="weightDate" type="date">
+        <input id="weightValue" type="number" min="0" step="0.1" placeholder="Вес, кг">
+
+        <div class="modal-actions">
+            <button class="btn" onclick="saveWeight()">Сохранить</button>
+            <button class="btn btn-light" onclick="closeWeightModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

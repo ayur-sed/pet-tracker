@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Tracker — Календарь</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <h2>🐾 Pet Tracker</h2>
+        <nav class="menu">
+            <a href="index.html">Главная</a>
+            <a href="pets.html">Питомцы</a>
+            <a class="active" href="calendar.html">Календарь</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <section class="hero panel">
+            <div>
+                <h1>Календарь</h1>
+                <p>Вакцины, дни рождения, ветеринар, прогулки и другое.</p>
+            </div>
+            <button class="btn" onclick="openEventModal()">+ Добавить событие</button>
+        </section>
+
+        <section class="panel">
+            <div class="calendar-head">
+                <button class="btn btn-light" onclick="prevMonth()">◀</button>
+                <h2 id="calendarMonthTitle"></h2>
+                <button class="btn btn-light" onclick="nextMonth()">▶</button>
+            </div>
+
+            <div class="weekday-row">
+                <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+            </div>
+
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </section>
+
+        <section class="panel">
+            <h2>События</h2>
+            <div id="eventList" class="stack"></div>
+        </section>
+    </main>
+</div>
+
+<!-- МОДАЛКА СОБЫТИЯ -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-top">
+            <h3 id="eventModalTitle">Добавить событие</h3>
+            <button class="icon-btn" onclick="closeEventModal()">✕</button>
+        </div>
+
+        <input type="hidden" id="eventIndex">
+
+        <input id="eventDate" type="date">
+        <select id="eventType">
+            <option value="vaccine">Вакцина</option>
+            <option value="birthday">День рождения</option>
+            <option value="vet">Ветеринар</option>
+            <option value="walk">Прогулка</option>
+            <option value="medicine">Лекарства</option>
+            <option value="other">Другое</option>
+        </select>
+        <input id="eventTitle" type="text" placeholder="Что нужно сделать?">
+
+        <div class="modal-actions">
+            <button class="btn" onclick="saveEvent()">Сохранить</button>
+            <button class="btn btn-light" onclick="closeEventModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

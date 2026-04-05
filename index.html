@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Tracker — Главная</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <h2>🐾 Pet Tracker</h2>
+        <nav class="menu">
+            <a class="active" href="index.html">Главная</a>
+            <a href="pets.html">Питомцы</a>
+            <a href="calendar.html">Календарь</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <section class="hero panel">
+            <div>
+                <h1>Мои питомцы</h1>
+                <p>Ближайшие события и список питомцев.</p>
+            </div>
+            <button class="btn" onclick="openPetModal()">+ Добавить питомца</button>
+        </section>
+
+        <section class="panel">
+            <div class="section-head">
+                <h2>Ближайшие события</h2>
+            </div>
+            <div id="upcomingEvents" class="stack"></div>
+        </section>
+
+        <section class="panel">
+            <div class="section-head">
+                <h2>Питомцы</h2>
+            </div>
+            <div id="petsGrid" class="pets-grid"></div>
+        </section>
+    </main>
+</div>
+
+<!-- МОДАЛКА ПИТОМЦА -->
+<div id="petModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-top">
+            <h3 id="petModalTitle">Добавить питомца</h3>
+            <button class="icon-btn" onclick="closePetModal()">✕</button>
+        </div>
+
+        <input type="hidden" id="petIndex">
+
+        <input id="petName" type="text" placeholder="Имя питомца">
+        <input id="petSpecies" type="text" placeholder="Вид животного">
+        <select id="petGender">
+            <option value="">Пол</option>
+            <option value="Самец">Самец</option>
+            <option value="Самка">Самка</option>
+        </select>
+        <input id="petBirthDate" type="date">
+        <select id="petHousing">
+            <option value="">Где живёт</option>
+            <option value="Квартира">Квартира</option>
+            <option value="Свободный выгул">Свободный выгул</option>
+            <option value="Террариум">Террариум</option>
+        </select>
+
+        <div class="photo-box">
+            <img id="petPhotoPreview" alt="Фото питомца">
+        </div>
+
+        <input id="petPhoto" type="file" accept="image/*">
+
+        <div class="modal-actions">
+            <button class="btn" onclick="savePet()">Сохранить</button>
+            <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
