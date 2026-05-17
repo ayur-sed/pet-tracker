@@ -20,7 +20,36 @@
 
     <main class="content">
         <section id="profileCard"></section>
+        <section class="panel measurement-panel">
+    <h2>Как измерять питомца</h2>
 
+    <div class="measurement-grid">
+        <div class="measurement-card">
+            <h3>Рост собаки</h3>
+            <p>
+                Измеряется от пола до верхней точки холки.
+                Собака должна стоять ровно.
+            </p>
+        </div>
+
+        <div class="measurement-card">
+            <h3>BCS — Body Condition Score</h3>
+            <p>
+                Оцени рёбра, талию и живот.
+                Нормой считается BCS = 5.
+            </p>
+        </div>
+
+        <div class="measurement-card">
+            <h3>Тип телосложения</h3>
+            <p>
+                Лёгкое — худощавое.
+                Среднее — стандарт.
+                Тяжёлое — массивное.
+            </p>
+        </div>
+    </div>
+</section>
         <section class="panel">
             <div class="section-head">
                 <h2>История веса</h2>
@@ -48,7 +77,30 @@
         <input type="hidden" id="petIndex">
 
         <input id="petName" type="text" placeholder="Имя питомца">
-        <input id="petSpecies" type="text" placeholder="Вид животного">
+        <select id="petSpecies" onchange="toggleSpeciesFields()">
+    <option value="">Вид животного</option>
+    <option value="Собака">Собака</option>
+    <option value="Кошка">Кошка</option>
+</select>
+
+<select id="petBodyType">
+    <option value="">Тип телосложения</option>
+</select>
+
+<input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
+
+<select id="petBCS">
+    <option value="">BCS — индекс кондиции</option>
+    <option value="1">1 — Истощение</option>
+    <option value="2">2 — Сильный недобор</option>
+    <option value="3">3 — Недобор</option>
+    <option value="4">4 — Ниже нормы</option>
+    <option value="5">5 — Норма</option>
+    <option value="6">6 — Небольшой избыток</option>
+    <option value="7">7 — Избыточный вес</option>
+    <option value="8">8 — Ожирение</option>
+    <option value="9">9 — Сильное ожирение</option>
+</select>
         <select id="petGender">
             <option value="">Пол</option>
             <option value="Самец">Самец</option>
@@ -56,10 +108,10 @@
         </select>
         <input id="petBirthDate" type="date">
         <select id="petHousing">
-            <option value="">Где живёт</option>
+            <option value="">Содержание питомцы</option>
             <option value="Квартира">Квартира</option>
             <option value="Свободный выгул">Свободный выгул</option>
-            <option value="Террариум">Террариум</option>
+           
         </select>
 
         <div class="photo-box">
@@ -97,3 +149,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
