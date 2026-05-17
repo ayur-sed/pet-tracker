@@ -132,6 +132,11 @@ function renderPets() {
     if (!pets.length) { grid.innerHTML = `<div class="empty-state">Питомцев пока нет. Добавь первого.</div>`; return; }
     grid.innerHTML = pets.map((pet, index) => {
         const latestWeight = Array.isArray(pet.weights) && pet.weights.length ? pet.weights[pet.weights.length - 1] : null;
+        const idealWeight = calculateIdealWeight(pet);
+
+        const weightStatus = latestWeight
+    ? getWeightStatus(pet, latestWeight.value)
+    : null;
         return `<article class="pet-card" onclick="openProfile(${index})"><img class="pet-photo" src="${pet.photo || defaultAvatar(pet.name)}" alt="${escapeHtml(pet.name)}"><div class="pet-body"><h3 class="pet-name">${escapeHtml(pet.name)}</h3><div class="pet-meta"><div>Вид: ${escapeHtml(pet.species || "—")}</div><div>Пол: ${escapeHtml(pet.gender || "—")}</div><div>Возраст: ${calculateAgeYears(pet.birthDate)} лет</div><div>Содержание: ${escapeHtml(pet.housing || "—")}</div><div>${latestWeight ? `Последний вес: ${Number(latestWeight.value).toFixed(1)} кг` : "Вес пока не добавлен"}</div></div>
                     ${weightStatus ? `
                 <div class="weight-status ${weightStatus.className}">
@@ -187,16 +192,39 @@ function openPetModal(index = null) {
 function closePetModal() { const m = document.getElementById("petModal"); if (m) m.style.display = "none"; }
 async function savePet() {
     const petIndex = document.getElementById("petIndex"), petName = document.getElementById("petName"), petSpecies = document.getElementById("petSpecies"), petGender = document.getElementById("petGender"), petBirthDate = document.getElementById("petBirthDate"), petHousing = document.getElementById("petHousing"), petPhoto = document.getElementById("petPhoto");
-    const bodyType = document.getElementById("petBodyType").value;
-const height = parseFloat(document.getElementById("petHeight").value) || 0;
-const bcs = Number(document.getElementById("petBCS").value);
+    const bodyTypeElement = document.getElementById("petBodyType");
+    const heightElement = document.getElementById("petHeight");
+    const bcsElement = document.getElementById("petBCS");
 
-const name = petName.value.trim(), species = petSpecies.value.trim(), gender = petGender.value, birthDate = petBirthDate.value, housing = petHousing.value;
-    if (!name || !species || !gender || !birthDate || !housing) { alert("Заполни все поля питомца."); return; }
+    const bodyType = bodyTypeElement ? bodyTypeElement.value : "";
+    const height = heightElement ? parseFloat(heightElement.value) || 0 : 0;
+    const bcs = bcsElement ? Number(bcsElement.value) : 0;
+
+        const name = petName.value.trim();
+        const species = petSpecies.value;
+        const gender = petGender.value;
+        const birthDate = petBirthDate.value;
+        const housing = petHousing.value;
+        if ( !name ||  !species ||  !gender ||  !birthDate ||  !housing ||  !bodyType ) 
+            {  alert("Заполни все поля питомца.");
+            return;
+        }
+
     if (birthDate > todayISO()) { alert("Дата рождения не может быть в будущем."); return; }
     let photo = editingPetPhoto || defaultAvatar(name);
     if (petPhoto.files && petPhoto.files[0]) photo = await fileToDataUrl(petPhoto.files[0]);
-    const data = { name, species, gender, birthDate,  housing, photo, bodyType, height, bcs, weights: [] };
+            const data = {
+            name,
+            species,
+            gender,
+            birthDate,
+            housing,
+            photo,
+            bodyType,
+            height,
+            bcs,
+             weights: []
+         };
     const index = petIndex.value === "" ? null : Number(petIndex.value);
     if (index === null) pets.push({ id: Date.now(), ...data });
     else { const ex = pets[index]; pets[index] = { ...ex, ...data, weights: ex.weights || [] }; }
@@ -285,29 +313,150 @@ function getWeightStatus(pet, currentWeight) {
 }
 
 function renderProfile() {
-    const container = document.getElementById("profileCard"); if (!container) return;
-    const index = currentPetIndex(), pet = index !== null ? petByIndex(index) : null;
-    if (!pet) { container.innerHTML = `<section class="panel"><div class="empty-state">Питомец не выбран. Открой страницу "Питомцы" и нажми на карточку.</div></section>`; return; }
-    const sortedWeights = getSortedWeights(pet), latestWeight = sortedWeights.length ? sortedWeights[sortedWeights.length - 1] : null;
+
+    const container = document.getElementById("profileCard");
+
+    if (!container) return;
+
+    const index = currentPetIndex();
+    const pet = index !== null ? petByIndex(index) : null;
+
+    if (!pet) {
+        container.innerHTML = `
+        <section class="panel">
+            <div class="empty-state">
+                Питомец не выбран.
+            </div>
+        </section>
+        `;
+        return;
+    }
+
+    const sortedWeights = getSortedWeights(pet);
+
+    const latestWeight = sortedWeights.length
+        ? sortedWeights[sortedWeights.length - 1]
+        : null;
+
     const idealWeight = calculateIdealWeight(pet);
 
-const weightStatus = latestWeight
-    ? getWeightStatus(pet, latestWeight.value)
-    : null;
-    container.innerHTML = `<section class="pet-summary">
-    <div class="summary-card"><img src="${pet.photo || defaultAvatar(pet.name)}" alt="${escapeHtml(pet.name)}"></div>
-    <div class="summary-card summary-info"><h2>${escapeHtml(pet.name)}</h2>
-    <div class="summary-meta"><div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
-    <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div><div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
-    <div><b>Дата рождения:</b> ${pet.birthDate ? formatDate(pet.birthDate) : "—"}</div>
-    <div><b>Содержание:</b> ${escapeHtml(pet.housing || "—")}</div><div><b>Телосложение:</b> ${escapeHtml(pet.bodyType || "—")}</div>
-    <div><b>Рост:</b> ${pet.height || "—"} см</div>
-    <div><b>BCS:</b> ${pet.bcs || "—"}</div>
-    <div><b>Последний вес:</b> ${latestWeight ? `${Number(latestWeight.value).toFixed(1)} кг (${formatDate(latestWeight.date)})` : "ещё нет"}</div></div>
-    <div class="pet-actions"><button class="btn" onclick="editCurrentPet()">Редактировать</button>
-    <button class="btn btn-danger" onclick="deleteCurrentPet()">Удалить</button></div></div></section>`;
-    renderWeightList(); drawWeightChart();
+    const weightStatus = latestWeight
+        ? getWeightStatus(pet, latestWeight.value)
+        : null;
+
+    container.innerHTML = `
+
+    <section class="pet-summary">
+
+        <div class="summary-card">
+            <img
+                src="${pet.photo || defaultAvatar(pet.name)}"
+                alt="${escapeHtml(pet.name)}"
+            >
+        </div>
+
+        <div class="summary-card summary-info">
+
+            <h2>${escapeHtml(pet.name)}</h2>
+
+            <div class="summary-meta">
+
+                <div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
+
+                <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div>
+
+                <div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
+
+                <div><b>Дата рождения:</b>
+                    ${pet.birthDate ? formatDate(pet.birthDate) : "—"}
+                </div>
+
+                <div><b>Содержание:</b>
+                    ${escapeHtml(pet.housing || "—")}
+                </div>
+
+                <div><b>Телосложение:</b>
+                    ${escapeHtml(pet.bodyType || "—")}
+                </div>
+
+                <div><b>Рост:</b>
+                    ${pet.height || "—"} см
+                </div>
+
+                <div><b>BCS:</b>
+                    ${pet.bcs || "—"}
+                </div>
+
+                <div>
+                    <b>Последний вес:</b>
+
+                    ${latestWeight
+                        ? `${Number(latestWeight.value).toFixed(1)} кг`
+                        : "ещё нет данных"}
+                </div>
+
+            </div>
+
+            ${weightStatus ? `
+                <div class="weight-status ${weightStatus.className}">
+                    ${weightStatus.text}
+                </div>
+            ` : ""}
+
+            ${idealWeight ? `
+                <table class="weight-table">
+
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+
+                    <tr>
+                        <td>Идеальный вес</td>
+                        <td>${idealWeight.min} – ${idealWeight.max} кг</td>
+                    </tr>
+
+                    <tr>
+                        <td>Рост</td>
+                        <td>${pet.height || "—"} см</td>
+                    </tr>
+
+                    <tr>
+                        <td>BCS</td>
+                        <td>${pet.bcs || "—"}</td>
+                    </tr>
+
+                </table>
+            ` : ""}
+
+            <div class="pet-actions">
+
+                <button
+                    class="btn"
+                    onclick="editCurrentPet()"
+                >
+                    Редактировать
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="deleteCurrentPet()"
+                >
+                    Удалить
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+    `;
+
+    renderWeightList();
+
+    drawWeightChart();
 }
+
 function editCurrentPet() { const i = currentPetIndex(); if (i !== null) openPetModal(i); }
 function deleteCurrentPet() { const i = currentPetIndex(); if (i !== null) deletePet(i); }
 function openWeightModal(index = null) {
@@ -445,6 +594,11 @@ function setDefaultDateInputs() {
 }
 document.addEventListener("DOMContentLoaded", () => {
     toggleSpeciesFields();
+    const speciesSelect = document.getElementById("petSpecies");
+
+    if (speciesSelect) {
+        speciesSelect.addEventListener("change", toggleSpeciesFields);
+    }
     const petPhoto = document.getElementById("petPhoto"), petPhotoPreview = document.getElementById("petPhotoPreview");
     if (petPhoto && petPhotoPreview) petPhoto.addEventListener("change", async () => { const f = petPhoto.files && petPhoto.files[0]; if (f) petPhotoPreview.src = await fileToDataUrl(f); });
     renderPets(); renderProfile(); renderWeightList(); renderUpcomingEvents(); renderCalendar(); renderEventList(); drawWeightChart(); setDefaultDateInputs();
