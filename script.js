@@ -213,20 +213,26 @@ async function savePet() {
     if (birthDate > todayISO()) { alert("Дата рождения не может быть в будущем."); return; }
     let photo = editingPetPhoto || defaultAvatar(name);
     if (petPhoto.files && petPhoto.files[0]) photo = await fileToDataUrl(petPhoto.files[0]);
+            
             const data = {
-            name,
-            species,
-            gender,
-            birthDate,
-            housing,
-            photo,
-            bodyType,
-            height,
-            bcs,
-             weights: []
-         };
+    name,
+    species,
+    gender,
+    birthDate,
+    housing,
+    photo,
+    bodyType,
+    height,
+    bcs
+};
     const index = petIndex.value === "" ? null : Number(petIndex.value);
-    if (index === null) pets.push({ id: Date.now(), ...data });
+    if (index === null) {
+    pets.push({
+        id: Date.now(),
+        ...data,
+        weights: []
+    });
+}
     else { const ex = pets[index]; pets[index] = { ...ex, ...data, weights: ex.weights || [] }; }
     saveState(); closePetModal(); editingPetPhoto = "";
     renderPets(); renderProfile(); renderUpcomingEvents();
@@ -320,7 +326,9 @@ function renderProfile() {
 
     const index = currentPetIndex();
     const pet = index !== null ? petByIndex(index) : null;
-
+    if (pet && !Array.isArray(pet.weights)) {
+    pet.weights = [];
+}
     if (!pet) {
         container.innerHTML = `
         <section class="panel">
