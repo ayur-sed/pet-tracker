@@ -43,7 +43,30 @@
         <input type="hidden" id="petIndex">
 
         <input id="petName" type="text" placeholder="Имя питомца">
-        <input id="petSpecies" type="text" placeholder="Вид животного">
+        <select id="petSpecies" onchange="toggleSpeciesFields()">
+    <option value="">Вид животного</option>
+    <option value="Собака">Собака</option>
+    <option value="Кошка">Кошка</option>
+</select>
+
+<select id="petBodyType">
+    <option value="">Тип телосложения</option>
+</select>
+
+<input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
+
+<select id="petBCS">
+    <option value="">BCS — индекс кондиции</option>
+    <option value="1">1 — Истощение</option>
+    <option value="2">2 — Сильный недобор</option>
+    <option value="3">3 — Недобор</option>
+    <option value="4">4 — Ниже нормы</option>
+    <option value="5">5 — Норма</option>
+    <option value="6">6 — Небольшой избыток</option>
+    <option value="7">7 — Избыточный вес</option>
+    <option value="8">8 — Ожирение</option>
+    <option value="9">9 — Сильное ожирение</option>
+</select>
         <select id="petGender">
             <option value="">Пол</option>
             <option value="Самец">Самец</option>
@@ -51,10 +74,10 @@
         </select>
         <input id="petBirthDate" type="date">
         <select id="petHousing">
-            <option value="">Где живёт</option>
+            <option value="">Содержание питомца</option>
             <option value="Квартира">Квартира</option>
             <option value="Свободный выгул">Свободный выгул</option>
-            <option value="Террариум">Террариум</option>
+            
         </select>
 
         <div class="photo-box">
@@ -73,3 +96,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
