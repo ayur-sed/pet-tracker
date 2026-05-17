@@ -334,123 +334,135 @@ function renderProfile() {
 
     const sortedWeights = getSortedWeights(pet);
 
-    const latestWeight = sortedWeights.length
-        ? sortedWeights[sortedWeights.length - 1]
-        : null;
+    const latestWeight =
+        sortedWeights.length
+            ? sortedWeights[sortedWeights.length - 1]
+            : null;
 
     const idealWeight = calculateIdealWeight(pet);
 
-    const weightStatus = latestWeight
-        ? getWeightStatus(pet, latestWeight.value)
-        : null;
+    const weightStatus =
+        latestWeight
+            ? getWeightStatus(pet, latestWeight.value)
+            : null;
 
     container.innerHTML = `
 
-    <section class="pet-summary">
+<section class="pet-summary">
 
-        <div class="summary-card">
-            <img
-                src="${pet.photo || defaultAvatar(pet.name)}"
-                alt="${escapeHtml(pet.name)}"
-            >
-        </div>
+    <div class="summary-card">
 
-        <div class="summary-card summary-info">
+        <img
+            src="${pet.photo || defaultAvatar(pet.name)}"
+            alt="${escapeHtml(pet.name)}"
+        >
 
-            <h2>${escapeHtml(pet.name)}</h2>
+    </div>
 
-            <div class="summary-meta">
+    <div class="summary-card summary-info">
 
-                <div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
+        <h2>${escapeHtml(pet.name)}</h2>
 
-                <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div>
+        <div class="summary-meta">
 
-                <div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
+            <div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
 
-                <div><b>Дата рождения:</b>
-                    ${pet.birthDate ? formatDate(pet.birthDate) : "—"}
-                </div>
+            <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div>
 
-                <div><b>Содержание:</b>
-                    ${escapeHtml(pet.housing || "—")}
-                </div>
+            <div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
 
-                <div><b>Телосложение:</b>
-                    ${escapeHtml(pet.bodyType || "—")}
-                </div>
+            <div><b>Дата рождения:</b> ${
+                pet.birthDate
+                    ? formatDate(pet.birthDate)
+                    : "—"
+            }</div>
 
-                <div><b>Рост:</b>
-                    ${pet.height || "—"} см
-                </div>
+            <div><b>Содержание:</b> ${
+                escapeHtml(pet.housing || "—")
+            }</div>
 
-                <div><b>BCS:</b>
-                    ${pet.bcs || "—"}
-                </div>
+            <div><b>Телосложение:</b> ${
+                escapeHtml(pet.bodyType || "—")
+            }</div>
 
-                <div>
-                    <b>Последний вес:</b>
+            <div><b>Рост:</b> ${
+                pet.height || "—"
+            } см</div>
 
-                    ${latestWeight
+            <div><b>BCS:</b> ${
+                pet.bcs || "—"
+            }</div>
+
+            <div>
+                <b>Последний вес:</b>
+
+                ${
+                    latestWeight
                         ? `${Number(latestWeight.value).toFixed(1)} кг`
-                        : "ещё нет данных"}
-                </div>
-
-            </div>
-
-            ${weightStatus ? `
-                <div class="weight-status ${weightStatus.className}">
-                    ${weightStatus.text}
-                </div>
-            ` : ""}
-
-            ${idealWeight ? `
-                <table class="weight-table">
-
-                    <tr>
-                        <th>Параметр</th>
-                        <th>Значение</th>
-                    </tr>
-
-                    <tr>
-                        <td>Идеальный вес</td>
-                        <td>${idealWeight.min} – ${idealWeight.max} кг</td>
-                    </tr>
-
-                    <tr>
-                        <td>Рост</td>
-                        <td>${pet.height || "—"} см</td>
-                    </tr>
-
-                    <tr>
-                        <td>BCS</td>
-                        <td>${pet.bcs || "—"}</td>
-                    </tr>
-
-                </table>
-            ` : ""}
-
-            <div class="pet-actions">
-
-                <button
-                    class="btn"
-                    onclick="editCurrentPet()"
-                >
-                    Редактировать
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deleteCurrentPet()"
-                >
-                    Удалить
-                </button>
-
+                        : "ещё нет"
+                }
             </div>
 
         </div>
 
-    </section>
-    `;
+        ${weightStatus ? `
+
+        <div class="weight-status ${weightStatus.className}">
+            ${weightStatus.text}
+        </div>
+
+        ` : ""}
+
+        ${idealWeight ? `
+
+        <table class="weight-table">
+
+            <tr>
+                <th>Параметр</th>
+                <th>Значение</th>
+            </tr>
+
+            <tr>
+                <td>Идеальный вес</td>
+                <td>${idealWeight.min} – ${idealWeight.max} кг</td>
+            </tr>
+
+            <tr>
+                <td>Рост</td>
+                <td>${pet.height || "—"} см</td>
+            </tr>
+
+            <tr>
+                <td>BCS</td>
+                <td>${pet.bcs || "—"}</td>
+            </tr>
+
+        </table>
+
+        ` : ""}
+
+        <div class="pet-actions">
+
+            <button
+                class="btn"
+                onclick="editCurrentPet()"
+            >
+                Редактировать
+            </button>
+
+            <button
+                class="btn btn-danger"
+                onclick="deleteCurrentPet()"
+            >
+                Удалить
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+`;
 
     renderWeightList();
 
