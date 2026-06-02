@@ -10,7 +10,7 @@ const BODY_TYPES = {
     "Собака": [
         "Лёгкое",
         "Среднее",
-        "Тяжёлое"
+        "Крупное"
     ],
 
     "Кошка": [
@@ -21,9 +21,9 @@ const BODY_TYPES = {
 };
 
 const DOG_HEIGHT_RANGES = {
-    "Лёгкое": { min: 35, max: 50 },
-    "Среднее": { min: 45, max: 65 },
-    "Тяжёлое": { min: 60, max: 85 }
+    "Лёгкое": { min: 5, max: 10 },
+    "Среднее": { min: 10, max: 25 },
+    "Тяжёлое": { min: 25, max: 85 }
 };
 
 
@@ -269,7 +269,7 @@ function calculateIdealWeight(pet) {
             max = pet.height * 0.95;
         }
 
-        if (pet.bodyType === "Тяжёлое") {
+        if (pet.bodyType === "Крупное") {
             min = pet.height * 0.9;
             max = pet.height * 1.3;
         }
