@@ -5,28 +5,15 @@ let currentMonthView = new Date().getMonth();
 let currentYearView = new Date().getFullYear();
 let weightChartInstance = null;
 let editingPetPhoto = "";
-
 const BODY_TYPES = {
-    "Собака": [
-        "Лёгкое",
-        "Среднее",
-        "Крупное"
-    ],
-
-    "Кошка": [
-        "Лёгкое",
-        "Среднее",
-        "Крупное"
-    ]
+    "Собака": [ "Лёгкое", "Среднее",  "Крупное"],
+    "Кошка": [  "Лёгкое", "Среднее", "Крупное" ]
 };
-
 const DOG_HEIGHT_RANGES = {
     "Лёгкое": { min: 5, max: 10 },
     "Среднее": { min: 10, max: 25 },
     "Тяжёлое": { min: 25, max: 85 }
 };
-
-
 // ===== UTILS =====
 function todayISO() {
     const d = new Date();
@@ -81,15 +68,10 @@ function getSortedEvents() { return [...events].sort((a, b) => a.date.localeComp
 function toggleSpeciesFields() {
     const species = document.getElementById("petSpecies");
     const bodyType = document.getElementById("petBodyType");
-
     if (!species || !bodyType) return;
-
     const value = species.value;
-
     bodyType.innerHTML = '<option value="">Тип телосложения</option>';
-
     if (!BODY_TYPES[value]) return;
-
     BODY_TYPES[value].forEach(type => {
         const option = document.createElement("option");
         option.value = type;
@@ -97,7 +79,6 @@ function toggleSpeciesFields() {
         bodyType.appendChild(option);
     });
 }
-
 // ===== BIRTHDAY & UPCOMING LOGIC =====
 function getNextBirthdayInfo(pet) {
     if (!pet.birthDate) return null;
@@ -124,7 +105,6 @@ function getMergedUpcoming() {
             });
             return result.sort((a, b) => a.date.localeCompare(b.date));
     }
-
 // ===== PETS =====
 function renderPets() {
     const grid = document.getElementById("petsGrid");
@@ -141,29 +121,16 @@ function renderPets() {
                     ${weightStatus ? `
                 <div class="weight-status ${weightStatus.className}">
                     ${weightStatus.text}
-                </div>
-                ` : ""}
+                </div>  ` : ""}
 
                 ${idealWeight ? `
                 <table class="weight-table">
-                    <tr>
-                        <th>Параметр</th>
-                        <th>Значение</th>
-                    </tr>
-                    <tr>
-                        <td>Идеальный вес</td>
-                        <td>${idealWeight.min} – ${idealWeight.max} кг</td>
-                    </tr>
-                    <tr>
-                        <td>Рост</td>
-                        <td>${pet.height || "—"} см</td>
-                    </tr>
-                    <tr>
-                        <td>BCS</td>
-                        <td>${pet.bcs || "—"}</td>
-                    </tr>
-                </table>
-                ` : ""}
+                    <tr>  <th>Параметр</th>  <th>Значение</th></tr>
+                    <tr>  <td>Идеальный вес</td> <td>${idealWeight.min} – ${idealWeight.max} кг</td> </tr>
+                    <tr>  <td>Рост</td>  <td>${pet.height || "—"} см</td> </tr>
+                    <tr>  <td>BCS</td> <td>${pet.bcs || "—"}</td> </tr>
+                </table> ` : ""}
+                
         <div class="pet-actions"><button class="btn" onclick="event.stopPropagation(); editPet(${index})">Редактировать</button>
         <button class="btn btn-danger" onclick="event.stopPropagation(); deletePet(${index})">Удалить</button></div></div></article>`;
     }).join("");
@@ -214,24 +181,10 @@ async function savePet() {
     let photo = editingPetPhoto || defaultAvatar(name);
     if (petPhoto.files && petPhoto.files[0]) photo = await fileToDataUrl(petPhoto.files[0]);
             
-            const data = {
-    name,
-    species,
-    gender,
-    birthDate,
-    housing,
-    photo,
-    bodyType,
-    height,
-    bcs
-};
+         const data = { name,  species,  gender,  birthDate,  housing,  photo,  bodyType,  height,  bcs};
     const index = petIndex.value === "" ? null : Number(petIndex.value);
     if (index === null) {
-    pets.push({
-        id: Date.now(),
-        ...data,
-        weights: []
-    });
+    pets.push({  id: Date.now(),  ...data,  weights: [] });
 }
     else { const ex = pets[index]; pets[index] = { ...ex, ...data, weights: ex.weights || [] }; }
     saveState(); closePetModal(); editingPetPhoto = "";
@@ -246,7 +199,6 @@ function deletePet(index) {
     else if (cur !== null && cur > index) localStorage.setItem("currentPet", String(cur - 1));
     renderProfile();
 }
-
 // ===== PROFILE & WEIGHT =====
 function openProfile(index) { localStorage.setItem("currentPet", String(index)); window.location.href = "profile.html"; }
 
@@ -254,37 +206,30 @@ function calculateIdealWeight(pet) {
     if (!pet.height || !pet.bodyType) {
         return null;
     }
-
     let min = 0;
     let max = 0;
-
     if (pet.species === "Собака") {
         if (pet.bodyType === "Лёгкое") {
-            min = pet.height * 0.45;
-            max = pet.height * 0.65;
+            min = pet.height * 0.40;
+            max = pet.height * 0.60;
         }
-
         if (pet.bodyType === "Среднее") {
             min = pet.height * 0.60;
             max = pet.height * 0.95;
         }
-
         if (pet.bodyType === "Крупное") {
             min = pet.height * 0.9;
             max = pet.height * 1.3;
         }
     }
-
     if (pet.species === "Кошка") {
         min = 3;
         max = 6;
-
         if (pet.bodyType === "Крупное") {
             min = 5;
             max = 8;
         }
     }
-
     return {
         min: Number(min.toFixed(1)),
         max: Number(max.toFixed(1))
@@ -293,60 +238,43 @@ function calculateIdealWeight(pet) {
 
 function getWeightStatus(pet, currentWeight) {
     const ideal = calculateIdealWeight(pet);
-
-    if (!ideal || !currentWeight) {
-        return null;
-    }
-
+    if (!ideal || !currentWeight) {  return null; }
     if (currentWeight < ideal.min) {
         return {
             className: "weight-low",
             text: `Недобор веса. Норма: ${ideal.min}–${ideal.max} кг`
         };
     }
-
     if (currentWeight > ideal.max) {
         return {
             className: "weight-high",
             text: `Избыточный вес. Норма: ${ideal.min}–${ideal.max} кг`
         };
     }
-
     return {
         className: "weight-normal",
         text: `Вес в норме. Идеальный диапазон: ${ideal.min}–${ideal.max} кг`
     };
 }
-
 function renderProfile() {
 
     const container = document.getElementById("profileCard");
-
     if (!container) return;
-
     const index = currentPetIndex();
     const pet = index !== null ? petByIndex(index) : null;
     if (pet && !Array.isArray(pet.weights)) {
     pet.weights = [];
 }
     if (!pet) {
-        container.innerHTML = `
-        <section class="panel">
-            <div class="empty-state">
-                Питомец не выбран.
-            </div>
-        </section>
-        `;
+        container.innerHTML = ` <section class="panel">  <div class="empty-state">  Питомец не выбран.  </div>   </section> `;
         return;
     }
-
     const sortedWeights = getSortedWeights(pet);
-
+    
     const latestWeight =
         sortedWeights.length
             ? sortedWeights[sortedWeights.length - 1]
             : null;
-
     const idealWeight = calculateIdealWeight(pet);
 
     const weightStatus =
@@ -354,126 +282,64 @@ function renderProfile() {
             ? getWeightStatus(pet, latestWeight.value)
             : null;
 
-    container.innerHTML = `
-
-<section class="pet-summary">
-
+    container.innerHTML = `<section class="pet-summary">
     <div class="summary-card">
-
-        <img
-            src="${pet.photo || defaultAvatar(pet.name)}"
-            alt="${escapeHtml(pet.name)}"
-        >
-
+        <img   src="${pet.photo || defaultAvatar(pet.name)}"  alt="${escapeHtml(pet.name)}" >
     </div>
-
     <div class="summary-card summary-info">
-
         <h2>${escapeHtml(pet.name)}</h2>
-
         <div class="summary-meta">
-
             <div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
-
             <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div>
-
             <div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
-
             <div><b>Дата рождения:</b> ${
                 pet.birthDate
                     ? formatDate(pet.birthDate)
                     : "—"
             }</div>
-
-            <div><b>Содержание:</b> ${
-                escapeHtml(pet.housing || "—")
-            }</div>
-
-            <div><b>Телосложение:</b> ${
-                escapeHtml(pet.bodyType || "—")
-            }</div>
-
-            <div><b>Рост:</b> ${
-                pet.height || "—"
-            } см</div>
-
-            <div><b>BCS:</b> ${
-                pet.bcs || "—"
-            }</div>
-
+            <div><b>Содержание:</b> ${    escapeHtml(pet.housing || "—") }</div>
+            <div><b>Телосложение:</b> ${  escapeHtml(pet.bodyType || "—") }</div>
+            <div><b>Рост:</b> ${  pet.height || "—" } см</div>
+            <div><b>BCS:</b> ${   pet.bcs || "—"  }</div>
             <div>
                 <b>Последний вес:</b>
-
-                ${
-                    latestWeight
+                ${   latestWeight
                         ? `${Number(latestWeight.value).toFixed(1)} кг`
                         : "ещё нет"
                 }
             </div>
-
         </div>
-
         ${weightStatus ? `
-
         <div class="weight-status ${weightStatus.className}">
-            ${weightStatus.text}
+        ${weightStatus.text}
         </div>
-
         ` : ""}
 
         ${idealWeight ? `
-
         <table class="weight-table">
-
             <tr>
-                <th>Параметр</th>
-                <th>Значение</th>
+                <th>Параметр</th> <th>Значение</th>
             </tr>
-
             <tr>
-                <td>Идеальный вес</td>
-                <td>${idealWeight.min} – ${idealWeight.max} кг</td>
+                <td>Идеальный вес</td> <td>${idealWeight.min} – ${idealWeight.max} кг</td>
             </tr>
-
             <tr>
-                <td>Рост</td>
-                <td>${pet.height || "—"} см</td>
+                <td>Рост</td> <td>${pet.height || "—"} см</td>
             </tr>
-
             <tr>
-                <td>BCS</td>
-                <td>${pet.bcs || "—"}</td>
+                <td>BCS</td> <td>${pet.bcs || "—"}</td>
             </tr>
-
         </table>
-
         ` : ""}
-
+        
         <div class="pet-actions">
-
-            <button
-                class="btn"
-                onclick="editCurrentPet()"
-            >
-                Редактировать
-            </button>
-
-            <button
-                class="btn btn-danger"
-                onclick="deleteCurrentPet()"
-            >
-                Удалить
-            </button>
-
+            <button  class="btn" onclick="editCurrentPet()" > Редактировать</button>
+            <button class="btn btn-danger" onclick="deleteCurrentPet()"> Удалить</button>
         </div>
-
     </div>
-
 </section>
 `;
-
     renderWeightList();
-
     drawWeightChart();
 }
 
@@ -606,7 +472,6 @@ function renderEventList() {
         return `<div class="event-card"><div class="event-main"><div class="event-title">${escapeHtml(eventTypeLabel(ev.type))}</div><div class="small">${formatDate(ev.date)} — ${escapeHtml(ev.title)} ${petName}</div></div><div class="record-actions"><button class="btn btn-light" onclick="editEvent(${idx})">Редактировать</button><button class="btn btn-danger" onclick="deleteEvent(${idx})">Удалить</button></div></div>`;
     }).join("");
 }
-
 // ===== INIT & EXPORTS =====
 function setDefaultDateInputs() {
     const wd = document.getElementById("weightDate"), ed = document.getElementById("eventDate");
@@ -615,10 +480,7 @@ function setDefaultDateInputs() {
 document.addEventListener("DOMContentLoaded", () => {
     toggleSpeciesFields();
     const speciesSelect = document.getElementById("petSpecies");
-
-    if (speciesSelect) {
-        speciesSelect.addEventListener("change", toggleSpeciesFields);
-    }
+    if (speciesSelect) {  speciesSelect.addEventListener("change", toggleSpeciesFields); }
     const petPhoto = document.getElementById("petPhoto"), petPhotoPreview = document.getElementById("petPhotoPreview");
     if (petPhoto && petPhotoPreview) petPhoto.addEventListener("change", async () => { const f = petPhoto.files && petPhoto.files[0]; if (f) petPhotoPreview.src = await fileToDataUrl(f); });
     renderPets(); renderProfile(); renderWeightList(); renderUpcomingEvents(); renderCalendar(); renderEventList(); drawWeightChart(); setDefaultDateInputs();
