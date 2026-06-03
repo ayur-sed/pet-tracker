@@ -23,9 +23,17 @@
                 <h1>Питомцы</h1>
                 <p>Добавляй, редактируй и удаляй питомцев.</p>
             </div>
-             <button class="btn" onclick="openPetModal()">+ Добавить питомца</button>
-            <button class="btn" onclick="exportData()">Вывести данные</button>
+            <button class="btn" onclick="openPetModal()">+ Добавить питомца</button>
+            <button class="btn" onclick="exportData()"> Вывести данные </button>
             <button class="btn" onclick="document.getElementById('importFile').click()"> Скачать данные</button>
+
+<input
+    type="file"
+    id="importFile"
+    accept=".json"
+    style="display:none"
+    onchange="importData(event)"
+> 
         </section>
 
         <section class="panel">
@@ -79,7 +87,6 @@
             <option value="">Содержание питомца</option>
             <option value="Квартира">Квартира</option>
             <option value="Свободный выгул">Свободный выгул</option>
-            
         </select>
 
         <div class="photo-box">
@@ -98,4 +105,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
