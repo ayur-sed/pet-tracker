@@ -485,8 +485,45 @@ document.addEventListener("DOMContentLoaded", () => {
     if (petPhoto && petPhotoPreview) petPhoto.addEventListener("change", async () => { const f = petPhoto.files && petPhoto.files[0]; if (f) petPhotoPreview.src = await fileToDataUrl(f); });
     renderPets(); renderProfile(); renderWeightList(); renderUpcomingEvents(); renderCalendar(); renderEventList(); drawWeightChart(); setDefaultDateInputs();
 });
+function exportData() {
+    const data = { pets: pets, events: events  };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob(
+        [json],
+        { type: "application/json" }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pet-tracker-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data =
+                JSON.parse(e.target.result);
+            pets = data.pets || [];
+            events = data.events || [];
+            saveState();
+            renderPets();
+            renderProfile();
+            renderUpcomingEvents();
+            renderCalendar();
+            renderEventList();
+            alert("Данные успешно импортированы");
+   } catch {   alert("Ошибка чтения файла");  }
+    };
+    reader.readAsText(file);
+}
 window.openPetModal = openPetModal; window.closePetModal = closePetModal; window.savePet = savePet; window.editPet = editPet; window.deletePet = deletePet;
 window.openProfile = openProfile; window.editCurrentPet = editCurrentPet; window.deleteCurrentPet = deleteCurrentPet;
 window.openWeightModal = openWeightModal; window.closeWeightModal = closeWeightModal; window.saveWeight = saveWeight; window.editWeight = editWeight; window.deleteWeight = deleteWeight;
 window.openEventModal = openEventModal; window.closeEventModal = closeEventModal; window.saveEvent = saveEvent; window.editEvent = editEvent; window.deleteEvent = deleteEvent;
-window.prevMonth = prevMonth; window.nextMonth = nextMonth;
+window.prevMonth = prevMonth; window.nextMonth = nextMonth; 
+window.exportData = exportData;
+window.importData = importData;
