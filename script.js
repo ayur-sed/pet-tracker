@@ -79,7 +79,7 @@ function toggleSpeciesFields() {
         bodyType.appendChild(option);
     });
 }
-// ===== BIRTHDAY & UPCOMING LOGIC =====
+// др
 function getNextBirthdayInfo(pet) {
     if (!pet.birthDate) return null;
     const today = new Date(todayISO() + "T00:00:00");
@@ -199,7 +199,7 @@ function deletePet(index) {
     else if (cur !== null && cur > index) localStorage.setItem("currentPet", String(cur - 1));
     renderProfile();
 }
-// ===== PROFILE & WEIGHT =====
+// профиль и вес
 function openProfile(index) { localStorage.setItem("currentPet", String(index)); window.location.href = "profile.html"; }
 
 function calculateIdealWeight(pet) {
@@ -210,16 +210,16 @@ function calculateIdealWeight(pet) {
     let max = 0;
     if (pet.species === "Собака") {
         if (pet.bodyType === "Лёгкое") {
-            min = pet.height * 0.40;
-            max = pet.height * 0.60;
+            min = pet.height * 0.15;
+            max = pet.height * 0.35;
         }
         if (pet.bodyType === "Среднее") {
-            min = pet.height * 0.60;
-            max = pet.height * 0.95;
+            min = pet.height * 0.15;
+            max = pet.height * 0.3;
         }
         if (pet.bodyType === "Крупное") {
-            min = pet.height * 0.9;
-            max = pet.height * 1.3;
+            min = pet.height * 0.15;
+            max = pet.height * 0,5;
         }
     }
     if (pet.species === "Кошка") {
@@ -389,7 +389,7 @@ function drawWeightChart() {
     weightChartInstance = new Chart(canvas, { type: "line", data: { labels, datasets: [{ label: "Вес (кг)", data, borderWidth: 2, tension: 0.35, fill: false }] }, options: { responsive: true, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: false } } } });
 }
 
-// ===== EVENTS & CALENDAR (WITH PET LINKING) =====
+// Кадендарь и событие
 function updateEventPetSelect(selectedId = "") {
     const select = document.getElementById("eventPetId");
     if (!select) return;
@@ -472,7 +472,7 @@ function renderEventList() {
         return `<div class="event-card"><div class="event-main"><div class="event-title">${escapeHtml(eventTypeLabel(ev.type))}</div><div class="small">${formatDate(ev.date)} — ${escapeHtml(ev.title)} ${petName}</div></div><div class="record-actions"><button class="btn btn-light" onclick="editEvent(${idx})">Редактировать</button><button class="btn btn-danger" onclick="deleteEvent(${idx})">Удалить</button></div></div>`;
     }).join("");
 }
-// ===== INIT & EXPORTS =====
+// экспорт импорт
 function setDefaultDateInputs() {
     const wd = document.getElementById("weightDate"), ed = document.getElementById("eventDate");
     if (wd && !wd.value) wd.value = todayISO(); if (ed && !ed.value) ed.value = todayISO();
@@ -547,6 +547,7 @@ function importData(event) {
 
     reader.readAsText(file);
 }
+//привязывание
 window.openPetModal = openPetModal; window.closePetModal = closePetModal; window.savePet = savePet; window.editPet = editPet; window.deletePet = deletePet;
 window.openProfile = openProfile; window.editCurrentPet = editCurrentPet; window.deleteCurrentPet = deleteCurrentPet;
 window.openWeightModal = openWeightModal; window.closeWeightModal = closeWeightModal; window.saveWeight = saveWeight; window.editWeight = editWeight; window.deleteWeight = deleteWeight;
