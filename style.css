@@ -35,19 +35,20 @@ body {
 
 .sidebar h2 {
     margin: 0 0 24px;
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .menu {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .menu a {
     color: white;
     text-decoration: none;
-    padding: 12px 14px;
+    padding: 16px 20px;    
+    font-size: 18px;  
     border-radius: 14px;
     background: rgba(255,255,255,0.06);
     transition: 0.2s;
@@ -191,7 +192,8 @@ body {
     color: white;
     border: none;
     border-radius: 14px;
-    padding: 11px 16px;
+    padding: 13px 20px;     
+    font-size: 16px; 
     font-weight: 600;
     cursor: pointer;
 }
