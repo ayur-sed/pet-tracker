@@ -1,4 +1,4 @@
-// ===== GLOBAL STATE =====
+// Глобальные обьекты 
 let pets = JSON.parse(localStorage.getItem("pets")) || [];
 let events = JSON.parse(localStorage.getItem("events")) || [];
 let currentMonthView = new Date().getMonth();
@@ -14,20 +14,20 @@ const DOG_HEIGHT_RANGES = {
     "Среднее": { min: 10, max: 25 },
     "Тяжёлое": { min: 25, max: 85 }
 };
-// ===== UTILS =====
-function todayISO() {
+// Функции глобальные
+function todayISO() { //сегоднящняя дата
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().slice(0, 10);
 }
-function saveState() {
+function saveState() {//сохраняет питомцев и события в браузер
     localStorage.setItem("pets", JSON.stringify(pets));
     localStorage.setItem("events", JSON.stringify(events));
 }
-function escapeHtml(text) {
+function escapeHtml(text) {//преобразует в HTML в строку
     return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
-function fileToDataUrl(file) {
+function fileToDataUrl(file) { //преобр файл изобр в строку при запуске
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
@@ -35,14 +35,14 @@ function fileToDataUrl(file) {
         reader.readAsDataURL(file);
     });
 }
-function defaultAvatar(name = "🐾") {
+function defaultAvatar(name = "🐾") {//фотография по умолчанию если не загр изобр
     const letter = (name && name.trim()[0]) ? name.trim()[0].toUpperCase() : "🐾";
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="100%" height="100%" rx="24" fill="#eaf2ff"/><circle cx="400" cy="210" r="110" fill="#c9dbff"/><text x="50%" y="56%" text-anchor="middle" font-family="Arial" font-size="90" fill="#3559a5">${letter}</text></svg>`;
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
-function parseDate(iso) { return new Date(iso + "T00:00:00"); }
-function formatDate(iso) { return parseDate(iso).toLocaleDateString("ru-RU"); }
-function calculateAgeYears(birthDate) {
+function parseDate(iso) { return new Date(iso + "T00:00:00"); }//преобр строку даты в объект
+function formatDate(iso) { return parseDate(iso).toLocaleDateString("ru-RU"); }// преобр формат даты в рус 
+function calculateAgeYears(birthDate) {//вычисляет возраст
     if (!birthDate) return 0;
     const birth = parseDate(birthDate), now = new Date();
     let age = now.getFullYear() - birth.getFullYear();
@@ -50,8 +50,8 @@ function calculateAgeYears(birthDate) {
     if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
     return Math.max(0, age);
 }
-function petByIndex(index) { return pets[index]; }
-function currentPetIndex() {
+function petByIndex(index) { return pets[index]; }// возвращает питомца из массива pets
+function currentPetIndex() {//
     const v = localStorage.getItem("currentPet");
     return v === null ? null : Number(v);
 }
@@ -105,7 +105,7 @@ function getMergedUpcoming() {
             });
             return result.sort((a, b) => a.date.localeCompare(b.date));
     }
-// ===== PETS =====
+//  PETS 
 function renderPets() {
     const grid = document.getElementById("petsGrid");
     if (!grid) return;
@@ -486,44 +486,71 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPets(); renderProfile(); renderWeightList(); renderUpcomingEvents(); renderCalendar(); renderEventList(); drawWeightChart(); setDefaultDateInputs();
 });
 function exportData() {
-    const data = { pets: pets, events: events  };
+
+    const data = {
+        pets: pets,
+        events: events
+    };
+
     const json = JSON.stringify(data, null, 2);
+
     const blob = new Blob(
         [json],
         { type: "application/json" }
     );
+
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
+
     a.href = url;
     a.download = "pet-tracker-data.json";
+
     a.click();
+
     URL.revokeObjectURL(url);
 }
 function importData(event) {
+
     const file = event.target.files[0];
+
     if (!file) return;
+
     const reader = new FileReader();
+
     reader.onload = function(e) {
+
         try {
+
             const data =
                 JSON.parse(e.target.result);
+
             pets = data.pets || [];
             events = data.events || [];
+
             saveState();
+
             renderPets();
             renderProfile();
             renderUpcomingEvents();
             renderCalendar();
             renderEventList();
+
             alert("Данные успешно импортированы");
-   } catch {   alert("Ошибка чтения файла");  }
+
+        } catch {
+
+            alert("Ошибка чтения файла");
+
+        }
     };
+
     reader.readAsText(file);
 }
 window.openPetModal = openPetModal; window.closePetModal = closePetModal; window.savePet = savePet; window.editPet = editPet; window.deletePet = deletePet;
 window.openProfile = openProfile; window.editCurrentPet = editCurrentPet; window.deleteCurrentPet = deleteCurrentPet;
 window.openWeightModal = openWeightModal; window.closeWeightModal = closeWeightModal; window.saveWeight = saveWeight; window.editWeight = editWeight; window.deleteWeight = deleteWeight;
 window.openEventModal = openEventModal; window.closeEventModal = closeEventModal; window.saveEvent = saveEvent; window.editEvent = editEvent; window.deleteEvent = deleteEvent;
-window.prevMonth = prevMonth; window.nextMonth = nextMonth; 
+window.prevMonth = prevMonth; window.nextMonth = nextMonth;
 window.exportData = exportData;
 window.importData = importData;
