@@ -14,12 +14,13 @@
             <a href="index.html">Главная</a>
             <a href="pets.html">Питомцы</a>
             <a href="calendar.html">Календарь</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
         </nav>
     </aside>
     <main class="content">
-        <section id="profileCard"></section>
+        <section id="profileCard" data-tour="profileCard"></section>
 
-        <section class="panel measurement-panel">
+        <section class="panel measurement-panel" data-tour="measurement">
             <h2>Как измерять питомца</h2>
             <div class="measurement-grid">
                 <div class="measurement-card">
@@ -37,17 +38,16 @@
             </div>
         </section>
 
-        <section class="panel">
+        <section class="panel" data-tour="weightChart">
             <h2>График веса</h2>
             <canvas id="weightChart" height="50"></canvas>
         </section>
 
-        <section class="panel">
+        <section class="panel" data-tour="weightHistory">
             <div class="section-head">
                 <h2>История веса</h2>
                 <button class="btn" onclick="openWeightModal()">+ Добавить вес</button>
             </div>
-            <!-- ПОДСКАЗКА: как правильно взвешивать -->
             <div class="hint-box">
                 💡 <b>Как взвешивать:</b> ставь питомца на весы в одно и то же время,
                 желательно утром до кормления. Записывай вес с точностью до 0,1 кг.
@@ -71,9 +71,7 @@
             <option value="Собака">Собака</option>
             <option value="Кошка">Кошка</option>
         </select>
-        <select id="petBodyType">
-            <option value="">Тип телосложения</option>
-        </select>
+        <select id="petBodyType"><option value="">Тип телосложения</option></select>
         <input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
         <select id="petBCS">
             <option value="">BCS — индекс кондиции</option>
@@ -119,7 +117,6 @@
         <input type="hidden" id="weightIndex">
         <input id="weightDate" type="date">
         <input id="weightValue" type="number" min="0" step="0.1" placeholder="Вес, кг">
-        <!-- ПОДСКАЗКА: формат ввода веса -->
         <div class="hint-inline">Вводи вес в килограммах, например: 4.2</div>
         <div class="modal-actions">
             <button class="btn" onclick="saveWeight()">Сохранить</button>
