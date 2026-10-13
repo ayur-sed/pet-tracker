@@ -82,6 +82,34 @@
         </div>
     </div>
 </div>
+    <!-- ФУТЕР -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h3>🐾 Pet Tracker</h3>
+            <p class="footer-about">
+                Трекер отслеживания здоровья животных.
+                Помогаем следить за здоровьем, весом и событиями ваших питомцев.
+            </p>
+        </div>
+        <div class="footer-col">
+            <h3>Контакты</h3>
+            <p>
+                📧 <a href="mailto:ayurzana.sedip@mail.ru">ayurzana.sedip@mail.ru</a>
+            </p>
+            <p class="footer-copy">© 2026 Pet Tracker. Все права защищены.</p>
+        </div>
+        <div class="footer-col">
+            <h3>Отзывы</h3>
+            <form class="review-form" onsubmit="submitReview(event)">
+                <input type="text" id="reviewName" placeholder="Ваше имя" required maxlength="40">
+                <textarea id="reviewText" placeholder="Ваш отзыв..." required maxlength="300"></textarea>
+                <button type="submit" class="btn">Отправить отзыв</button>
+            </form>
+            <div id="reviewsList" class="reviews-list"></div>
+        </div>
+    </div>
+</footer>
 <script src="script.js"></script>
 </body>
 </html>
