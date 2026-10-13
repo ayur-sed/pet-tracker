@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="app">
     <aside class="sidebar">
         <h2>🐾 Pet Tracker</h2>
@@ -14,26 +13,24 @@
             <a class="active" href="index.html">Главная</a>
             <a href="pets.html">Питомцы</a>
             <a href="calendar.html">Календарь</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
         </nav>
     </aside>
-
     <main class="content">
-     
-             <section class="hero panel">
+        <section class="hero panel" data-tour="hero">
             <div>
                 <h1>Мои питомцы</h1>
                 <p>Ближайшие события и список питомцев.</p>
             </div>
-             <button class="btn" onclick="openPetModal()">+ Добавить питомца</button>
-                 
+            <button class="btn" data-tour="addPetBtn" onclick="openPetModal()">+ Добавить питомца</button>
         </section>
-       <section class="panel">
-    <div class="section-head">   <h2> Питомцы </h2> </div>
-    <div id="petsGrid" class="pets-grid" data-compact="true"></div>
-</section>
         <section class="panel">
-            <div class="section-head">    <h2>Ближайшие события</h2> </div>
-            <div id="upcomingEvents" class="stack"></div>
+            <div class="section-head"><h2>Питомцы</h2></div>
+            <div id="petsGrid" class="pets-grid" data-compact="true" data-tour="petsGrid"></div>
+        </section>
+        <section class="panel">
+            <div class="section-head"><h2>Ближайшие события</h2></div>
+            <div id="upcomingEvents" class="stack" data-tour="upcoming"></div>
         </section>
     </main>
 </div>
@@ -45,34 +42,27 @@
             <h3 id="petModalTitle">Добавить питомца</h3>
             <button class="icon-btn" onclick="closePetModal()">✕</button>
         </div>
-
         <input type="hidden" id="petIndex">
-
         <input id="petName" type="text" placeholder="Имя питомца">
         <select id="petSpecies" onchange="toggleSpeciesFields()">
-    <option value="">Вид животного</option>
-    <option value="Собака">Собака</option>
-    <option value="Кошка">Кошка</option>
-</select>
-
-<select id="petBodyType">
-    <option value="">Тип телосложения</option>
-</select>
-
-<input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
-
-<select id="petBCS">
-    <option value="">BCS — индекс кондиции</option>
-    <option value="1">1 — Истощение</option>
-    <option value="2">2 — Сильный недобор</option>
-    <option value="3">3 — Недобор</option>
-    <option value="4">4 — Ниже нормы</option>
-    <option value="5">5 — Норма</option>
-    <option value="6">6 — Небольшой избыток</option>
-    <option value="7">7 — Избыточный вес</option>
-    <option value="8">8 — Ожирение</option>
-    <option value="9">9 — Сильное ожирение</option>
-</select>
+            <option value="">Вид животного</option>
+            <option value="Собака">Собака</option>
+            <option value="Кошка">Кошка</option>
+        </select>
+        <select id="petBodyType"><option value="">Тип телосложения</option></select>
+        <input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
+        <select id="petBCS">
+            <option value="">BCS — индекс кондиции</option>
+            <option value="1">1 — Истощение</option>
+            <option value="2">2 — Сильный недобор</option>
+            <option value="3">3 — Недобор</option>
+            <option value="4">4 — Ниже нормы</option>
+            <option value="5">5 — Норма</option>
+            <option value="6">6 — Небольшой избыток</option>
+            <option value="7">7 — Избыточный вес</option>
+            <option value="8">8 — Ожирение</option>
+            <option value="9">9 — Сильное ожирение</option>
+        </select>
         <select id="petGender">
             <option value="">Пол</option>
             <option value="Самец">Самец</option>
@@ -83,23 +73,17 @@
             <option value="">Содержание питомца</option>
             <option value="Квартира">Квартира</option>
             <option value="Свободный выгул">Свободный выгул</option>
-          
         </select>
-
         <div class="photo-box">
             <img id="petPhotoPreview" alt="Фото питомца">
         </div>
-
         <input id="petPhoto" type="file" accept="image/*">
-
         <div class="modal-actions">
             <button class="btn" onclick="savePet()">Сохранить</button>
             <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
         </div>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>
-
