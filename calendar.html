@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="app">
     <aside class="sidebar">
         <h2>🐾 Pet Tracker</h2>
@@ -14,35 +13,31 @@
             <a href="index.html">Главная</a>
             <a href="pets.html">Питомцы</a>
             <a class="active" href="calendar.html">Календарь</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
         </nav>
     </aside>
-
     <main class="content">
-        <section class="hero panel">
+        <section class="hero panel" data-tour="hero">
             <div>
                 <h1>Календарь</h1>
-                <p>Вакцины, дни рождения, ветеринар, прогулки и другое.</p>
+                <p>Вакцины, ветеринар, прогулки и другое.</p>
             </div>
-            <button class="btn" onclick="openEventModal()">+ Добавить событие</button>
+            <button class="btn" data-tour="addEventBtn" onclick="openEventModal()">+ Добавить событие</button>
         </section>
-
         <section class="panel">
             <div class="calendar-head">
-                <button class="btn btn-light" onclick="prevMonth()">◀</button>
+                <button class="btn btn-light" data-tour="prevMonth" onclick="prevMonth()">◀</button>
                 <h2 id="calendarMonthTitle"></h2>
-                <button class="btn btn-light" onclick="nextMonth()">▶</button>
+                <button class="btn btn-light" data-tour="nextMonth" onclick="nextMonth()">▶</button>
             </div>
-
             <div class="weekday-row">
                 <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
             </div>
-
-            <div id="calendarGrid" class="calendar-grid"></div>
+            <div id="calendarGrid" class="calendar-grid" data-tour="calendarGrid"></div>
         </section>
-
         <section class="panel">
             <h2>События</h2>
-            <div id="eventList" class="stack"></div>
+            <div id="eventList" class="stack" data-tour="eventList"></div>
         </section>
     </main>
 </div>
@@ -54,27 +49,22 @@
             <h3 id="eventModalTitle">Добавить событие</h3>
             <button class="icon-btn" onclick="closeEventModal()">✕</button>
         </div>
-
         <input type="hidden" id="eventIndex">
-
         <input id="eventDate" type="date">
         <select id="eventType">
             <option value="vaccine">Вакцина</option>
-            
             <option value="vet">Ветеринар</option>
             <option value="walk">Прогулка</option>
             <option value="medicine">Лекарства</option>
             <option value="other">Другое</option>
         </select>
         <input id="eventTitle" type="text" placeholder="Что нужно сделать?">
-
         <div class="modal-actions">
             <button class="btn" onclick="saveEvent()">Сохранить</button>
             <button class="btn btn-light" onclick="closeEventModal()">Отмена</button>
         </div>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>
