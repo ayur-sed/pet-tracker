@@ -60,6 +60,7 @@ function getAgeString(birthDate) {
     const diffTime = now - birth;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
+    if (diffDays < 0) return "0 дней";
     if (diffDays < 7) return "менее недели";
     if (diffDays < 30) {
         const weeks = Math.floor(diffDays / 7);
@@ -302,10 +303,8 @@ function openProfile(index) {
     window.location.href = "profile.html";
 }
 
-// НОВОЕ: Безопасный расчёт веса (игнорирует формулы для животных младше 1 года)
+// ИСПРАВЛЕНО: Сначала проверяем возраст, чтобы показать сообщение для котят даже без роста/телосложения
 function calculateIdealWeight(pet) {
-    if (!pet.height || !pet.bodyType) return null;
-    
     if (pet.birthDate) {
         const birth = parseDate(pet.birthDate);
         const now = new Date();
@@ -314,6 +313,9 @@ function calculateIdealWeight(pet) {
             return { isPuppyKitten: true }; // Специальный флаг для растущих животных
         }
     }
+
+    // Для взрослых проверяем наличие роста и телосложения
+    if (!pet.height || !pet.bodyType) return null;
 
     let min = 0, max = 0;
     if (pet.species === "Собака") {
@@ -330,15 +332,16 @@ function calculateIdealWeight(pet) {
 
 function getWeightStatus(pet, currentWeight) {
     const ideal = calculateIdealWeight(pet);
-    if (!ideal || !currentWeight) return null;
+    if (!currentWeight) return null; // Если веса нет, статус не показываем
     
-    // НОВОЕ: Не пугать владельца, если питомец растёт
-    if (ideal.isPuppyKitten) {
+    if (ideal && ideal.isPuppyKitten) {
         return { 
             className: "weight-normal", 
             text: "🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара." 
         };
     }
+    
+    if (!ideal) return null; // Если это взрослый, но нет данных для расчёта
     
     if (currentWeight < ideal.min) return { className: "weight-low", text: `Недобор веса. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
     if (currentWeight > ideal.max) return { className: "weight-high", text: `Избыточный вес. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
