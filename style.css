@@ -194,198 +194,55 @@ body {
 
 /* ===== Мобильная версия: меню сверху ===== */
 @media (max-width: 900px) {
-    .app {
-        flex-direction: column;
-    }
-
-    /* Сайдбар превращается в верхнюю панель */
+    .app { flex-direction: column; }
     .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 14px 12px;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        width: 100%; height: auto; padding: 14px 12px;
+        position: sticky; top: 0; z-index: 10;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    .sidebar h2 {
-        margin: 0 0 10px;
-        font-size: 22px;
-        text-align: center;
-    }
-
-    /* Меню становится горизонтальным */
-    .menu {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
-        justify-content: center;
-    }
-    .menu a {
-        padding: 8px 12px;
-        font-size: 14px;
-        border-radius: 10px;
-        flex: 1 1 auto;
-        text-align: center;
-        min-width: 0;
-        white-space: nowrap;
-    }
-    .menu a.tour-trigger {
-        flex: 0 1 auto;
-        font-size: 13px;
-        padding: 8px 10px;
-    }
-
-    /* Контент */
-    .content {
-        padding: 14px;
-    }
-
-    /* Hero: кнопки в столбик или в ряд */
-    .hero {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-    .hero h1 {
-        font-size: 24px;
-    }
-    .hero .btn {
-        width: 100%;
-        text-align: center;
-    }
-    /* На странице pets.html несколько кнопок — делаем их в ряд с переносом */
-    .hero {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-    .hero > div {
-        flex: 1 1 100%;
-    }
-    .hero .btn {
-        flex: 1 1 auto;
-        min-width: 120px;
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    /* Секции */
-    .section-head,
-    .calendar-head {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-    .section-head .btn,
-    .calendar-head .btn {
-        width: 100%;
-    }
-
-    /* Сетка питомцев — 2 колонки на мобилке */
-    .pets-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    .pets-grid[data-compact="true"] {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .pet-photo {
-        height: 120px;
-    }
-    .pet-card-compact .pet-photo {
-        height: 100px;
-    }
-    .pet-name {
-        font-size: 16px;
-    }
-    .pet-meta {
-        font-size: 12px;
-    }
-    .pet-body {
-        padding: 10px;
-    }
-
-    /* Профиль питомца — в столбик */
-    .pet-summary {
-        grid-template-columns: 1fr;
-    }
-    .summary-photo-card img {
-        min-height: 220px;
-    }
-
-    /* Календарь — компактные ячейки */
-    .calendar-day {
-        min-height: 70px;
-        padding: 6px;
-    }
-    .day-number {
-        font-size: 13px;
-    }
-    .event-pill {
-        font-size: 10px;
-        padding: 2px 5px;
-    }
-    .weekday-row div {
-        font-size: 12px;
-    }
-
-    /* Модалки — на всю ширину */
-    .modal-content {
-        width: 100%;
-        padding: 16px;
-    }
-
-    /* Подсказки (тур) — на всю ширину */
-    .tour-tooltip {
-        width: calc(100vw - 24px);
-        left: 12px !important;
-        right: 12px;
-    }
-
-    /* Измерения — в столбик */
-    .measurement-grid {
-        grid-template-columns: 1fr;
-    }
-
-    /* Таблица веса — компактнее */
-    .weight-table {
-        font-size: 12px;
-    }
-    .weight-table td,
-    .weight-table th {
-        padding: 4px 6px;
-    }
+    .sidebar h2 { margin: 0 0 10px; font-size: 22px; text-align: center; }
+    .menu { flex-direction: row; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .menu a { padding: 8px 12px; font-size: 14px; border-radius: 10px; flex: 1 1 auto; text-align: center; min-width: 0; white-space: nowrap; }
+    .menu a.tour-trigger { flex: 0 1 auto; font-size: 13px; padding: 8px 10px; }
+    .content { padding: 14px; }
+    .hero { flex-direction: column; align-items: stretch; gap: 12px; }
+    .hero h1 { font-size: 24px; }
+    .hero .btn { width: 100%; text-align: center; }
+    .hero { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    .hero > div { flex: 1 1 100%; }
+    .hero .btn { flex: 1 1 auto; min-width: 120px; padding: 10px 14px; font-size: 14px; }
+    .section-head, .calendar-head { flex-direction: column; align-items: stretch; gap: 8px; }
+    .section-head .btn, .calendar-head .btn { width: 100%; }
+    .pets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .pets-grid[data-compact="true"] { grid-template-columns: repeat(2, 1fr); }
+    .pet-photo { height: 120px; }
+    .pet-card-compact .pet-photo { height: 100px; }
+    .pet-name { font-size: 16px; }
+    .pet-meta { font-size: 12px; }
+    .pet-body { padding: 10px; }
+    .pet-summary { grid-template-columns: 1fr; }
+    .summary-photo-card img { min-height: 220px; }
+    .calendar-day { min-height: 70px; padding: 6px; }
+    .day-number { font-size: 13px; }
+    .event-pill { font-size: 10px; padding: 2px 5px; }
+    .weekday-row div { font-size: 12px; }
+    .modal-content { width: 100%; padding: 16px; }
+    .tour-tooltip { width: calc(100vw - 24px); left: 12px !important; right: 12px; }
+    .measurement-grid { grid-template-columns: 1fr; }
+    .weight-table { font-size: 12px; }
+    .weight-table td, .weight-table th { padding: 4px 6px; }
 }
 
-/* Совсем маленькие экраны (до 400px) */
 @media (max-width: 400px) {
-    .sidebar h2 {
-        font-size: 18px;
-    }
-    .menu a {
-        font-size: 12px;
-        padding: 6px 8px;
-    }
-    .hero h1 {
-        font-size: 20px;
-    }
-    .pets-grid {
-        grid-template-columns: 1fr;
-    }
-    .pets-grid[data-compact="true"] {
-        grid-template-columns: 1fr;
-    }
+    .sidebar h2 { font-size: 18px; }
+    .menu a { font-size: 12px; padding: 6px 8px; }
+    .hero h1 { font-size: 20px; }
+    .pets-grid { grid-template-columns: 1fr; }
+    .pets-grid[data-compact="true"] { grid-template-columns: 1fr; }
 }
 
-.measurement-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px; margin-top: 16px;
-}
-.measurement-card {
-    background: #f8fbff; border: 1px solid #dbeafe;
-    border-radius: 18px; padding: 16px;
-}
+.measurement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+.measurement-card { background: #f8fbff; border: 1px solid #dbeafe; border-radius: 18px; padding: 16px; }
 .measurement-card h3 { margin-top: 0; }
 
 .weight-status { margin-top: 14px; padding: 14px; border-radius: 16px; font-weight: 600; }
@@ -394,16 +251,11 @@ body {
 .weight-high { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
 .weight-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
-.weight-table td, .weight-table th {
-    border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left;
-}
+.weight-table td, .weight-table th { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; }
 .weight-table th { background: #f1f5f9; }
 
 /* ===== Компактная карточка ===== */
-.pets-grid[data-compact="true"] {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-}
+.pets-grid[data-compact="true"] { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .pet-card-compact .pet-photo { height: 130px; }
 .pet-card-compact .pet-body { padding: 10px 12px; gap: 4px; }
 .pet-card-compact .pet-name { font-size: 17px; }
@@ -415,29 +267,21 @@ body {
     background: linear-gradient(135deg, #f0f7ff 0%, #e8f0ff 100%);
     border: 2px dashed #93c5fd;
     display: flex; align-items: center; justify-content: center;
-    min-height: 200px;
-    transition: all 0.2s;
+    min-height: 200px; transition: all 0.2s;
 }
 .pet-card-add:hover {
     border-color: var(--primary);
     background: linear-gradient(135deg, #e0ecff 0%, #d6e4ff 100%);
     transform: translateY(-3px);
 }
-.pet-card-add-inner {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px; color: #3b82f6;
-}
+.pet-card-add-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #3b82f6; }
 .pet-card-add-icon {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: white;
+    width: 60px; height: 60px; border-radius: 50%; background: white;
     display: flex; align-items: center; justify-content: center;
     font-size: 36px; font-weight: 300; line-height: 1;
     box-shadow: 0 4px 12px rgba(79, 140, 255, 0.2);
 }
-.pet-card-add-text {
-    font-size: 14px; font-weight: 600;
-    text-align: center;
-}
+.pet-card-add-text { font-size: 14px; font-weight: 600; text-align: center; }
 
 /* ===== Подсказки ===== */
 .hint-box {
@@ -447,6 +291,43 @@ body {
     margin-bottom: 12px; line-height: 1.5;
 }
 .hint-inline { color: var(--muted); font-size: 13px; margin-top: -4px; }
+
+/* ===== Тултипы (всплывающие подсказки при наведении) ===== */
+.tooltip {
+    position: relative;
+    border-bottom: 1px dotted var(--primary);
+    cursor: help;
+    color: var(--primary);
+    font-weight: 600;
+}
+.tooltip:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: normal;
+    max-width: 250px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    line-height: 1.4;
+}
+.tooltip:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+    z-index: 100;
+}
 
 /* ===== Тур (подсказки) ===== */
 .tour-highlight {
@@ -472,27 +353,9 @@ body {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.tour-tooltip-head {
-    display: flex; justify-content: space-between;
-    align-items: center; gap: 10px;
-}
-.tour-tooltip-title {
-    font-size: 17px; font-weight: 700; color: var(--text);
-}
-.tour-tooltip-counter {
-    font-size: 12px; color: var(--muted);
-    background: #f1f5f9; padding: 4px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-}
-.tour-tooltip-text {
-    font-size: 14px; line-height: 1.5; color: #374151;
-}
-.tour-tooltip-actions {
-    display: flex; justify-content: space-between;
-    gap: 10px; margin-top: 4px;
-}
-.tour-tooltip-actions .btn {
-    padding: 10px 16px; font-size: 14px;
-}
-
+.tour-tooltip-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.tour-tooltip-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.tour-tooltip-counter { font-size: 12px; color: var(--muted); background: #f1f5f9; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.tour-tooltip-text { font-size: 14px; line-height: 1.5; color: #374151; }
+.tour-tooltip-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.tour-tooltip-actions .btn { padding: 10px 16px; font-size: 14px; }
