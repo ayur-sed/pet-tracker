@@ -41,14 +41,38 @@ function defaultAvatar(name = "🐾") {
 }
 function parseDate(iso) { return new Date(iso + "T00:00:00"); }
 function formatDate(iso) { return parseDate(iso).toLocaleDateString("ru-RU"); }
-function calculateAgeYears(birthDate) {
-    if (!birthDate) return 0;
-    const birth = parseDate(birthDate), now = new Date();
-    let age = now.getFullYear() - birth.getFullYear();
-    const m = now.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
-    return Math.max(0, age);
+
+// НОВОЕ: Правильное склонение слов (1 месяц, 2 месяца, 5 месяцев)
+function pluralize(n, forms) {
+    const abs = Math.abs(n) % 100;
+    const n1 = abs % 10;
+    if (abs > 10 && abs < 20) return forms[2];
+    if (n1 > 1 && n1 < 5) return forms[1];
+    if (n1 === 1) return forms[0];
+    return forms[2];
 }
+
+// НОВОЕ: Умный расчёт возраста для котят и щенков
+function getAgeString(birthDate) {
+    if (!birthDate) return "—";
+    const birth = parseDate(birthDate);
+    const now = new Date();
+    const diffTime = now - birth;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 7) return "менее недели";
+    if (diffDays < 30) {
+        const weeks = Math.floor(diffDays / 7);
+        return `${weeks} ${pluralize(weeks, ['неделя', 'недели', 'недель'])}`;
+    }
+    const diffMonths = Math.floor(diffDays / 30.44);
+    if (diffMonths < 12) {
+        return `${diffMonths} ${pluralize(diffMonths, ['месяц', 'месяца', 'месяцев'])}`;
+    }
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} ${pluralize(diffYears, ['год', 'года', 'лет'])}`;
+}
+
 function petByIndex(index) { return pets[index]; }
 function currentPetIndex() {
     const v = localStorage.getItem("currentPet");
@@ -118,7 +142,6 @@ function renderPets() {
         return;
     }
     if (!pets.length && compact) {
-        // На главной всегда показываем карточку "+"
         grid.innerHTML = renderAddPetCard();
         return;
     }
@@ -135,7 +158,7 @@ function renderPets() {
                 <div class="pet-body">
                     <h3 class="pet-name">${escapeHtml(pet.name)}</h3>
                     <div class="pet-meta">
-                        <div>${escapeHtml(pet.species || "—")}, ${calculateAgeYears(pet.birthDate)} лет</div>
+                        <div>${escapeHtml(pet.species || "—")}, ${getAgeString(pet.birthDate)}</div>
                         <div>${latestWeight ? `Вес: ${Number(latestWeight.value).toFixed(1)} кг` : "Вес не добавлен"}</div>
                     </div>
                     ${weightStatus ? `<div class="weight-status ${weightStatus.className}">${weightStatus.text}</div>` : ""}
@@ -152,7 +175,7 @@ function renderPets() {
                 <div class="pet-meta">
                     <div>Вид: ${escapeHtml(pet.species || "—")}</div>
                     <div>Пол: ${escapeHtml(pet.gender || "—")}</div>
-                    <div>Возраст: ${calculateAgeYears(pet.birthDate)} лет</div>
+                    <div>Возраст: ${getAgeString(pet.birthDate)}</div>
                     <div>Содержание: ${escapeHtml(pet.housing || "—")}</div>
                     <div>${latestWeight ? `Последний вес: ${Number(latestWeight.value).toFixed(1)} кг` : "Вес пока не добавлен"}</div>
                 </div>
@@ -160,7 +183,9 @@ function renderPets() {
                 ${idealWeight ? `
                 <table class="weight-table">
                     <tr><th>Параметр</th><th>Значение</th></tr>
-                    <tr><td>Идеальный вес</td><td>${idealWeight.min} – ${idealWeight.max} кг</td></tr>
+                    ${idealWeight.isPuppyKitten 
+                        ? `<tr><td colspan="2" style="text-align:center; color:#22c55e; font-weight:600;">🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара.</td></tr>` 
+                        : `<tr><td>Идеальный вес</td><td>${idealWeight.min} – ${idealWeight.max} кг</td></tr>`}
                     <tr><td>Рост</td><td>${pet.height || "—"} см</td></tr>
                     <tr><td>BCS</td><td>${pet.bcs || "—"}</td></tr>
                 </table>` : ""}
@@ -172,9 +197,7 @@ function renderPets() {
         </article>`;
     }).join("");
 
-    // На главной добавляем карточку "+" в конец
     if (compact) html += renderAddPetCard();
-
     grid.innerHTML = html;
 }
 
@@ -278,8 +301,20 @@ function openProfile(index) {
     localStorage.setItem("currentPet", String(index));
     window.location.href = "profile.html";
 }
+
+// НОВОЕ: Безопасный расчёт веса (игнорирует формулы для животных младше 1 года)
 function calculateIdealWeight(pet) {
     if (!pet.height || !pet.bodyType) return null;
+    
+    if (pet.birthDate) {
+        const birth = parseDate(pet.birthDate);
+        const now = new Date();
+        const diffDays = Math.floor((now - birth) / (1000 * 60 * 60 * 24));
+        if (diffDays < 365) {
+            return { isPuppyKitten: true }; // Специальный флаг для растущих животных
+        }
+    }
+
     let min = 0, max = 0;
     if (pet.species === "Собака") {
         if (pet.bodyType === "Лёгкое") { min = pet.height * 0.15; max = pet.height * 0.35; }
@@ -290,15 +325,26 @@ function calculateIdealWeight(pet) {
         min = 3; max = 6;
         if (pet.bodyType === "Крупное") { min = 5; max = 8; }
     }
-    return { min: Number(min.toFixed(1)), max: Number(max.toFixed(1)) };
+    return { min: Number(min.toFixed(1)), max: Number(max.toFixed(1)), isPuppyKitten: false };
 }
+
 function getWeightStatus(pet, currentWeight) {
     const ideal = calculateIdealWeight(pet);
     if (!ideal || !currentWeight) return null;
-    if (currentWeight < ideal.min) return { className: "weight-low", text: `Недобор веса. Норма: ${ideal.min}–${ideal.max} кг` };
-    if (currentWeight > ideal.max) return { className: "weight-high", text: `Избыточный вес. Норма: ${ideal.min}–${ideal.max} кг` };
+    
+    // НОВОЕ: Не пугать владельца, если питомец растёт
+    if (ideal.isPuppyKitten) {
+        return { 
+            className: "weight-normal", 
+            text: "🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара." 
+        };
+    }
+    
+    if (currentWeight < ideal.min) return { className: "weight-low", text: `Недобор веса. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
+    if (currentWeight > ideal.max) return { className: "weight-high", text: `Избыточный вес. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
     return { className: "weight-normal", text: `Вес в норме. Идеальный диапазон: ${ideal.min}–${ideal.max} кг` };
 }
+
 function renderProfile() {
     const container = document.getElementById("profileCard");
     if (!container) return;
@@ -324,7 +370,7 @@ function renderProfile() {
             <div class="summary-meta">
                 <div><b>Вид:</b> ${escapeHtml(pet.species || "—")}</div>
                 <div><b>Пол:</b> ${escapeHtml(pet.gender || "—")}</div>
-                <div><b>Возраст:</b> ${calculateAgeYears(pet.birthDate)} лет</div>
+                <div><b>Возраст:</b> ${getAgeString(pet.birthDate)}</div>
                 <div><b>Дата рождения:</b> ${pet.birthDate ? formatDate(pet.birthDate) : "—"}</div>
                 <div><b>Содержание:</b> ${escapeHtml(pet.housing || "—")}</div>
                 <div><b>Телосложение:</b> ${escapeHtml(pet.bodyType || "—")}</div>
@@ -336,7 +382,9 @@ function renderProfile() {
             ${idealWeight ? `
             <table class="weight-table">
                 <tr><th>Параметр</th><th>Значение</th></tr>
-                <tr><td>Идеальный вес</td><td>${idealWeight.min} – ${idealWeight.max} кг</td></tr>
+                ${idealWeight.isPuppyKitten 
+                    ? `<tr><td colspan="2" style="text-align:center; color:#22c55e; font-weight:600;">🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара.</td></tr>` 
+                    : `<tr><td>Идеальный вес</td><td>${idealWeight.min} – ${idealWeight.max} кг</td></tr>`}
                 <tr><td>Рост</td><td>${pet.height || "—"} см</td></tr>
                 <tr><td>BCS</td><td>${pet.bcs || "—"}</td></tr>
             </table>` : ""}
@@ -662,7 +710,6 @@ function getCurrentPage() {
 function startTour() {
     const page = getCurrentPage();
     const allSteps = TOUR_STEPS[page] || [];
-    // Фильтруем только те шаги, где элемент реально есть на странице
     tourState.steps = allSteps.filter(s => document.querySelector(s.selector));
     if (!tourState.steps.length) {
         alert("Подсказки для этой страницы пока не настроены.");
@@ -683,13 +730,9 @@ function showTourStep() {
     const target = document.querySelector(step.selector);
     if (!target) { nextTourStep(); return; }
 
-    // Прокручиваем к элементу
     target.scrollIntoView({ behavior: "smooth", block: "center" });
-
-    // Подсветка
     target.classList.add("tour-highlight");
 
-    // Создаём/обновляем тултип
     let tooltip = document.getElementById("tourTooltip");
     if (!tooltip) {
         tooltip = document.createElement("div");
@@ -711,8 +754,6 @@ function showTourStep() {
         </div>
     `;
     tooltip.style.display = "block";
-
-    // Позиционирование
     requestAnimationFrame(() => positionTourTooltip(target, tooltip));
 }
 
@@ -722,15 +763,12 @@ function positionTourTooltip(target, tooltip) {
     const margin = 16;
     const vw = window.innerWidth, vh = window.innerHeight;
 
-    // По умолчанию — снизу справа от элемента
     let top = rect.bottom + margin + window.scrollY;
     let left = rect.left + window.scrollX;
 
-    // Если не помещается справа — прижимаем к правому краю
     if (left + tRect.width > vw - margin) left = vw - tRect.width - margin;
     if (left < margin) left = margin;
 
-    // Если не помещается снизу — показываем сверху
     if (rect.bottom + tRect.height + margin > vh) {
         top = rect.top - tRect.height - margin + window.scrollY;
     }
@@ -784,7 +822,6 @@ document.addEventListener("DOMContentLoaded", () => {
     drawWeightChart();
     setDefaultDateInputs();
 
-    // Автостарт тура при первом посещении
     if (!localStorage.getItem("tourDone")) {
         setTimeout(startTour, 600);
     }
