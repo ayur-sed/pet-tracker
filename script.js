@@ -17,15 +17,18 @@ function todayISO() {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().slice(0, 10);
 }
+
 function saveState() {
     localStorage.setItem("pets", JSON.stringify(pets));
     localStorage.setItem("events", JSON.stringify(events));
 }
+
 function escapeHtml(text) {
     return String(text)
         .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
+
 function fileToDataUrl(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -34,11 +37,13 @@ function fileToDataUrl(file) {
         reader.readAsDataURL(file);
     });
 }
+
 function defaultAvatar(name = "🐾") {
     const letter = (name && name.trim()[0]) ? name.trim()[0].toUpperCase() : "🐾";
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="100%" height="100%" rx="24" fill="#eaf2ff"/><circle cx="400" cy="210" r="110" fill="#c9dbff"/><text x="50%" y="56%" text-anchor="middle" font-family="Arial" font-size="90" fill="#3559a5">${letter}</text></svg>`;
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
+
 function parseDate(iso) { return new Date(iso + "T00:00:00"); }
 function formatDate(iso) { return parseDate(iso).toLocaleDateString("ru-RU"); }
 
@@ -72,19 +77,26 @@ function getAgeString(birthDate) {
 }
 
 function petByIndex(index) { return pets[index]; }
+
 function currentPetIndex() {
     const v = localStorage.getItem("currentPet");
     return v === null ? null : Number(v);
 }
+
 function eventTypeLabel(type) {
     const labels = { vaccine: "Вакцина", birthday: "День рождения", vet: "Ветеринар", walk: "Прогулка", medicine: "Лекарства", other: "Другое" };
     return labels[type] || "Событие";
 }
+
 function getSortedWeights(pet) {
     const list = Array.isArray(pet.weights) ? [...pet.weights] : [];
     return list.sort((a, b) => a.date.localeCompare(b.date));
 }
-function getSortedEvents() { return [...events].sort((a, b) => a.date.localeCompare(b.date)); }
+
+// ИСПРАВЛЕНО: Сортировка событий от новых к старым (по убыванию даты)
+function getSortedEvents() { 
+    return [...events].sort((a, b) => b.date.localeCompare(a.date)); 
+}
 
 function toggleSpeciesFields() {
     const species = document.getElementById("petSpecies");
@@ -113,22 +125,24 @@ function getNextBirthdayInfo(pet) {
 
 function getMergedUpcoming() {
     const today = todayISO(), result = [];
-    events.forEach((e, idx) => {
+    events.forEach((e) => {
         if (e.date >= today) {
             const daysLeft = Math.ceil((new Date(e.date + "T00:00:00") - new Date(today + "T00:00:00")) / (1000 * 60 * 60 * 24));
-            result.push({ ...e, index: idx, daysLeft, isAuto: false });
+            // Передаем оригинальный id для безопасного удаления
+            result.push({ ...e, daysLeft, isAuto: false });
         }
     });
-    pets.forEach(pet => {
+    pets.forEach((pet, petIdx) => {
         const info = getNextBirthdayInfo(pet);
         if (info && info.daysLeft >= 0 && info.daysLeft <= 365) {
             result.push({
                 date: info.date, type: "birthday",
                 title: `🎂 ДР ${pet.name}`, daysLeft: info.daysLeft,
-                isAuto: true, petId: pets.indexOf(pet)
+                isAuto: true, petId: petIdx, id: `bday-${petIdx}`
             });
         }
     });
+    // Ближайшие события сортируем по возрастанию (сначала самые скорые)
     return result.sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -295,6 +309,7 @@ async function savePet() {
 }
 
 function editPet(index) { openPetModal(index); }
+
 function deletePet(index) {
     const pet = pets[index];
     if (!confirm(`Удалить питомца "${pet.name}"?`)) return;
@@ -425,10 +440,12 @@ function openWeightModal(index = null) {
     }
     modal.style.display = "flex";
 }
+
 function closeWeightModal() {
     const m = document.getElementById("weightModal");
     if (m) m.style.display = "none";
 }
+
 function saveWeight() {
     const petIndex = currentPetIndex();
     if (petIndex === null || !pets[petIndex]) return;
@@ -447,7 +464,9 @@ function saveWeight() {
     saveState(); closeWeightModal();
     renderProfile(); renderPets();
 }
+
 function editWeight(index) { openWeightModal(index); }
+
 function deleteWeight(index) {
     const petIndex = currentPetIndex();
     if (petIndex === null || !pets[petIndex]) return;
@@ -455,6 +474,7 @@ function deleteWeight(index) {
     pets[petIndex].weights.splice(index, 1);
     saveState(); renderWeightList(); drawWeightChart(); renderProfile(); renderPets();
 }
+
 function renderWeightList() {
     const list = document.getElementById("weightList"); if (!list) return;
     const petIndex = currentPetIndex();
@@ -473,6 +493,7 @@ function renderWeightList() {
             </div>
         </li>`).join("");
 }
+
 function drawWeightChart() {
     const canvas = document.getElementById("weightChart");
     if (!canvas || typeof Chart === "undefined") return;
@@ -526,10 +547,12 @@ function openEventModal(date = todayISO(), index = null) {
     }
     modal.style.display = "flex";
 }
+
 function closeEventModal() {
     const m = document.getElementById("eventModal");
     if (m) m.style.display = "none";
 }
+
 function saveEvent() {
     const eventIndex = document.getElementById("eventIndex"),
           eventDate = document.getElementById("eventDate"),
@@ -550,17 +573,31 @@ function saveEvent() {
     saveState(); closeEventModal();
     renderCalendar(); renderEventList(); renderUpcomingEvents();
 }
-function editEvent(index) { openEventModal(events[index].date, index); }
-function deleteEvent(index) {
+
+// ИСПРАВЛЕНО: Функции поиска и действия по уникальному ID, а не по индексу отсортированного массива
+function editEventById(id) {
+    const index = events.findIndex(e => String(e.id) === String(id));
+    if (index !== -1) {
+        openEventModal(events[index].date, index);
+    }
+}
+
+function deleteEventById(id) {
     if (!confirm("Удалить событие?")) return;
-    events.splice(index, 1); saveState();
-    renderCalendar(); renderEventList(); renderUpcomingEvents();
+    const index = events.findIndex(e => String(e.id) === String(id));
+    if (index !== -1) {
+        events.splice(index, 1);
+        saveState();
+        renderCalendar();
+        renderEventList();
+        renderUpcomingEvents();
+    }
 }
 
 function renderUpcomingEvents() {
     const container = document.getElementById("upcomingEvents");
     if (!container) return;
-    const upcoming = getMergedUpcoming().slice(0, 3); // ИЗМЕНЕНО: показываем только 3 ближайших
+    const upcoming = getMergedUpcoming().slice(0, 3); // Показываем только 3 ближайших
     if (!upcoming.length) {
         container.innerHTML = `<div class="empty-state">Пока нет ближайших событий.</div>`;
         return;
@@ -569,6 +606,16 @@ function renderUpcomingEvents() {
         const petBadge = ev.petId !== undefined && pets[ev.petId]
             ? `<span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:12px;font-size:12px;margin-left:6px;">${escapeHtml(pets[ev.petId].name)}</span>`
             : '';
+        
+        let actionsHtml = '';
+        if (!ev.isAuto) {
+            actionsHtml = `
+            <div class="record-actions">
+                <button class="btn btn-light" onclick="editEventById('${ev.id}')">✏️</button>
+                <button class="btn btn-danger" onclick="deleteEventById('${ev.id}')">🗑️</button>
+            </div>`;
+        }
+
         return `
         <div class="event-card">
             <div class="event-main">
@@ -578,11 +625,7 @@ function renderUpcomingEvents() {
                     <span style="color:#22c55e;font-weight:600;margin-left:6px;">(через ${ev.daysLeft} дн.)</span>
                 </div>
             </div>
-            ${!ev.isAuto ? `
-            <div class="record-actions">
-                <button class="btn btn-light" onclick="editEvent(${ev.index})">✏️</button>
-                <button class="btn btn-danger" onclick="deleteEvent(${ev.index})">🗑️</button>
-            </div>` : ''}
+            ${actionsHtml}
         </div>`;
     }).join("");
 }
@@ -639,26 +682,29 @@ function renderCalendar() {
         grid.appendChild(cell);
     }
 }
+
 function prevMonth() {
     currentMonthView--;
     if (currentMonthView < 0) { currentMonthView = 11; currentYearView--; }
     renderCalendar();
 }
+
 function nextMonth() {
     currentMonthView++;
     if (currentMonthView > 11) { currentMonthView = 0; currentYearView++; }
     renderCalendar();
 }
 
+// ИСПРАВЛЕНО: Используем editEventById и deleteEventById вместо передачи индекса
 function renderEventList() {
     const container = document.getElementById("eventList");
     if (!container) return;
-    const sorted = getSortedEvents();
+    const sorted = getSortedEvents(); // Теперь сортируется от новых к старым
     if (!sorted.length) {
         container.innerHTML = `<div class="empty-state">Событий пока нет.</div>`;
         return;
     }
-    container.innerHTML = sorted.map((ev, idx) => {
+    container.innerHTML = sorted.map(ev => {
         const petName = ev.petId !== undefined && pets[ev.petId]
             ? `<span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:12px;font-size:12px;margin-left:8px;">${escapeHtml(pets[ev.petId].name)}</span>`
             : '';
@@ -669,8 +715,8 @@ function renderEventList() {
                 <div class="small">${formatDate(ev.date)} — ${escapeHtml(ev.title)} ${petName}</div>
             </div>
             <div class="record-actions">
-                <button class="btn btn-light" onclick="editEvent(${idx})">Редактировать</button>
-                <button class="btn btn-danger" onclick="deleteEvent(${idx})">Удалить</button>
+                <button class="btn btn-light" onclick="editEventById('${ev.id}')">Редактировать</button>
+                <button class="btn btn-danger" onclick="deleteEventById('${ev.id}')">Удалить</button>
             </div>
         </div>`;
     }).join("");
@@ -849,6 +895,7 @@ function exportData() {
     a.href = url; a.download = "pet-tracker-data.json"; a.click();
     URL.revokeObjectURL(url);
 }
+
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -875,7 +922,9 @@ window.editCurrentPet = editCurrentPet; window.deleteCurrentPet = deleteCurrentP
 window.openWeightModal = openWeightModal; window.closeWeightModal = closeWeightModal;
 window.saveWeight = saveWeight; window.editWeight = editWeight; window.deleteWeight = deleteWeight;
 window.openEventModal = openEventModal; window.closeEventModal = closeEventModal;
-window.saveEvent = saveEvent; window.editEvent = editEvent; window.deleteEvent = deleteEvent;
+window.saveEvent = saveEvent; 
+window.editEventById = editEventById; // Обновлено
+window.deleteEventById = deleteEventById; // Обновлено
 window.prevMonth = prevMonth; window.nextMonth = nextMonth;
 window.exportData = exportData; window.importData = importData;
 window.startTour = startTour; window.nextTourStep = nextTourStep; window.skipTour = skipTour;
