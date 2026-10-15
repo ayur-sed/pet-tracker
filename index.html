@@ -28,63 +28,63 @@
             <div class="section-head"><h2>Питомцы</h2></div>
             <div id="petsGrid" class="pets-grid" data-compact="true" data-tour="petsGrid"></div>
         </section>
-        <section class="panel">
+        <section class="panel" data-tour="upcoming">
             <div class="section-head"><h2>Ближайшие события</h2></div>
-            <div id="upcomingEvents" class="stack" data-tour="upcoming"></div>
+            <div id="upcomingEvents" class="stack"></div>
+            <a href="calendar.html" class="btn btn-light" style="width:100%; text-align:center; margin-top:12px; display:block;">Все события в календаре →</a>
         </section>
     </main>
-</div>
-
-<!-- МОДАЛКА ПИТОМЦА -->
-<div id="petModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-top">
-            <h3 id="petModalTitle">Добавить питомца</h3>
-            <button class="icon-btn" onclick="closePetModal()">✕</button>
-        </div>
-        <input type="hidden" id="petIndex">
-        <input id="petName" type="text" placeholder="Имя питомца">
-        <select id="petSpecies" onchange="toggleSpeciesFields()">
-            <option value="">Вид животного</option>
-            <option value="Собака">Собака</option>
-            <option value="Кошка">Кошка</option>
-        </select>
-        <select id="petBodyType"><option value="">Тип телосложения</option></select>
-        <input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
-        <select id="petBCS">
-            <option value="">BCS — индекс кондиции</option>
-            <option value="1">1 — Истощение</option>
-            <option value="2">2 — Сильный недобор</option>
-            <option value="3">3 — Недобор</option>
-            <option value="4">4 — Ниже нормы</option>
-            <option value="5">5 — Норма</option>
-            <option value="6">6 — Небольшой избыток</option>
-            <option value="7">7 — Избыточный вес</option>
-            <option value="8">8 — Ожирение</option>
-            <option value="9">9 — Сильное ожирение</option>
-        </select>
-        <select id="petGender">
-            <option value="">Пол</option>
-            <option value="Самец">Самец</option>
-            <option value="Самка">Самка</option>
-        </select>
-        <input id="petBirthDate" type="date">
-        <select id="petHousing">
-            <option value="">Содержание питомца</option>
-            <option value="Квартира">Квартира</option>
-            <option value="Свободный выгул">Свободный выгул</option>
-        </select>
-        <div class="photo-box">
-            <img id="petPhotoPreview" alt="Фото питомца">
-        </div>
-        <input id="petPhoto" type="file" accept="image/*">
-        <div class="modal-actions">
-            <button class="btn" onclick="savePet()">Сохранить</button>
-            <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
+    <!-- МОДАЛКА ПИТОМЦА -->
+    <div id="petModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3 id="petModalTitle">Добавить питомца</h3>
+                <button class="icon-btn" onclick="closePetModal()">✕</button>
+            </div>
+            <input type="hidden" id="petIndex">
+            <input id="petName" type="text" placeholder="Имя питомца">
+            <select id="petSpecies" onchange="toggleSpeciesFields()">
+                <option value="">Вид животного</option>
+                <option value="Собака">Собака</option>
+                <option value="Кошка">Кошка</option>
+            </select>
+            <select id="petBodyType"><option value="">Тип телосложения</option></select>
+            <input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
+            <select id="petBCS">
+                <option value="">BCS — индекс кондиции</option>
+                <option value="1">1 — Истощение</option>
+                <option value="2">2 — Сильный недобор</option>
+                <option value="3">3 — Недобор</option>
+                <option value="4">4 — Ниже нормы</option>
+                <option value="5">5 — Норма</option>
+                <option value="6">6 — Небольшой избыток</option>
+                <option value="7">7 — Избыточный вес</option>
+                <option value="8">8 — Ожирение</option>
+                <option value="9">9 — Сильное ожирение</option>
+            </select>
+            <select id="petGender">
+                <option value="">Пол</option>
+                <option value="Самец">Самец</option>
+                <option value="Самка">Самка</option>
+            </select>
+            <input id="petBirthDate" type="date">
+            <select id="petHousing">
+                <option value="">Содержание питомца</option>
+                <option value="Квартира">Квартира</option>
+                <option value="Свободный выгул">Свободный выгул</option>
+            </select>
+            <textarea id="petNotes" placeholder="Дополнительные сведения (аллергии, особенности поведения и т.д.)" style="width:100%; min-height:80px; padding:12px; border:1px solid var(--border); border-radius:14px; font-family:inherit; resize:vertical; outline:none;"></textarea>
+            <div class="photo-box">
+                <img id="petPhotoPreview" alt="Фото питомца">
+            </div>
+            <input id="petPhoto" type="file" accept="image/*">
+            <div class="modal-actions">
+                <button class="btn" onclick="savePet()">Сохранить</button>
+                <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
+            </div>
         </div>
     </div>
 </div>
-   
 <script src="script.js"></script>
 </body>
 </html>
