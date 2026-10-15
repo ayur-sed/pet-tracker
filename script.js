@@ -42,7 +42,6 @@ function defaultAvatar(name = "🐾") {
 function parseDate(iso) { return new Date(iso + "T00:00:00"); }
 function formatDate(iso) { return parseDate(iso).toLocaleDateString("ru-RU"); }
 
-// НОВОЕ: Правильное склонение слов (1 месяц, 2 месяца, 5 месяцев)
 function pluralize(n, forms) {
     const abs = Math.abs(n) % 100;
     const n1 = abs % 10;
@@ -52,14 +51,12 @@ function pluralize(n, forms) {
     return forms[2];
 }
 
-// НОВОЕ: Умный расчёт возраста для котят и щенков
 function getAgeString(birthDate) {
     if (!birthDate) return "—";
     const birth = parseDate(birthDate);
     const now = new Date();
     const diffTime = now - birth;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
     if (diffDays < 0) return "0 дней";
     if (diffDays < 7) return "менее недели";
     if (diffDays < 30) {
@@ -88,6 +85,7 @@ function getSortedWeights(pet) {
     return list.sort((a, b) => a.date.localeCompare(b.date));
 }
 function getSortedEvents() { return [...events].sort((a, b) => a.date.localeCompare(b.date)); }
+
 function toggleSpeciesFields() {
     const species = document.getElementById("petSpecies");
     const bodyType = document.getElementById("petBodyType");
@@ -102,6 +100,7 @@ function toggleSpeciesFields() {
         bodyType.appendChild(option);
     });
 }
+
 function getNextBirthdayInfo(pet) {
     if (!pet.birthDate) return null;
     const today = new Date(todayISO() + "T00:00:00");
@@ -111,6 +110,7 @@ function getNextBirthdayInfo(pet) {
     const diffDays = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
     return { date: next.toISOString().slice(0, 10), daysLeft: diffDays, petName: pet.name };
 }
+
 function getMergedUpcoming() {
     const today = todayISO(), result = [];
     events.forEach((e, idx) => {
@@ -148,8 +148,7 @@ function renderPets() {
     }
 
     let html = pets.map((pet, index) => {
-        const latestWeight = Array.isArray(pet.weights) && pet.weights.length
-            ? pet.weights[pet.weights.length - 1] : null;
+        const latestWeight = Array.isArray(pet.weights) && pet.weights.length ? pet.weights[pet.weights.length - 1] : null;
         const weightStatus = latestWeight ? getWeightStatus(pet, latestWeight.value) : null;
 
         if (compact) {
@@ -222,12 +221,15 @@ function openPetModal(index = null) {
           petBirthDate = document.getElementById("petBirthDate"),
           petHousing = document.getElementById("petHousing"),
           petPhotoPreview = document.getElementById("petPhotoPreview"),
-          petPhoto = document.getElementById("petPhoto");
+          petPhoto = document.getElementById("petPhoto"),
+          petNotes = document.getElementById("petNotes");
+    
     petPhoto.value = "";
     if (index === null) {
         editingPetPhoto = "";
         petIndex.value = ""; petName.value = ""; petSpecies.value = "";
         petGender.value = ""; petBirthDate.value = ""; petHousing.value = "";
+        if(petNotes) petNotes.value = "";
         petPhotoPreview.src = defaultAvatar("Питомец");
         title.textContent = "Добавить питомца";
     } else {
@@ -239,6 +241,7 @@ function openPetModal(index = null) {
         petGender.value = pet.gender || "";
         petBirthDate.value = pet.birthDate || "";
         petHousing.value = pet.housing || "";
+        if(petNotes) petNotes.value = pet.notes || "";
         setTimeout(() => {
             toggleSpeciesFields();
             document.getElementById("petBodyType").value = pet.bodyType || "";
@@ -250,10 +253,12 @@ function openPetModal(index = null) {
     }
     modal.style.display = "flex";
 }
+
 function closePetModal() {
     const m = document.getElementById("petModal");
     if (m) m.style.display = "none";
 }
+
 async function savePet() {
     const petIndex = document.getElementById("petIndex"),
           petName = document.getElementById("petName"),
@@ -261,23 +266,26 @@ async function savePet() {
           petGender = document.getElementById("petGender"),
           petBirthDate = document.getElementById("petBirthDate"),
           petHousing = document.getElementById("petHousing"),
-          petPhoto = document.getElementById("petPhoto");
+          petPhoto = document.getElementById("petPhoto"),
+          petNotes = document.getElementById("petNotes");
+          
     const bodyType = document.getElementById("petBodyType")?.value || "";
     const height = parseFloat(document.getElementById("petHeight")?.value) || 0;
     const bcs = Number(document.getElementById("petBCS")?.value) || 0;
     const name = petName.value.trim();
     const species = petSpecies.value, gender = petGender.value;
     const birthDate = petBirthDate.value, housing = petHousing.value;
+    const notes = petNotes ? petNotes.value.trim() : "";
 
     if (!name || !species || !gender || !birthDate || !housing || !bodyType) {
-        alert("Заполни все поля питомца."); return;
+        alert("Заполни все обязательные поля питомца."); return;
     }
     if (birthDate > todayISO()) { alert("Дата рождения не может быть в будущем."); return; }
 
     let photo = editingPetPhoto || defaultAvatar(name);
     if (petPhoto.files && petPhoto.files[0]) photo = await fileToDataUrl(petPhoto.files[0]);
 
-    const data = { name, species, gender, birthDate, housing, photo, bodyType, height, bcs };
+    const data = { name, species, gender, birthDate, housing, photo, bodyType, height, bcs, notes };
     const index = petIndex.value === "" ? null : Number(petIndex.value);
     if (index === null) pets.push({ id: Date.now(), ...data, weights: [] });
     else { const ex = pets[index]; pets[index] = { ...ex, ...data, weights: ex.weights || [] }; }
@@ -285,6 +293,7 @@ async function savePet() {
     saveState(); closePetModal(); editingPetPhoto = "";
     renderPets(); renderProfile(); renderUpcomingEvents();
 }
+
 function editPet(index) { openPetModal(index); }
 function deletePet(index) {
     const pet = pets[index];
@@ -303,20 +312,14 @@ function openProfile(index) {
     window.location.href = "profile.html";
 }
 
-// ИСПРАВЛЕНО: Сначала проверяем возраст, чтобы показать сообщение для котят даже без роста/телосложения
 function calculateIdealWeight(pet) {
     if (pet.birthDate) {
         const birth = parseDate(pet.birthDate);
         const now = new Date();
         const diffDays = Math.floor((now - birth) / (1000 * 60 * 60 * 24));
-        if (diffDays < 365) {
-            return { isPuppyKitten: true }; // Специальный флаг для растущих животных
-        }
+        if (diffDays < 365) return { isPuppyKitten: true };
     }
-
-    // Для взрослых проверяем наличие роста и телосложения
     if (!pet.height || !pet.bodyType) return null;
-
     let min = 0, max = 0;
     if (pet.species === "Собака") {
         if (pet.bodyType === "Лёгкое") { min = pet.height * 0.15; max = pet.height * 0.35; }
@@ -332,17 +335,11 @@ function calculateIdealWeight(pet) {
 
 function getWeightStatus(pet, currentWeight) {
     const ideal = calculateIdealWeight(pet);
-    if (!currentWeight) return null; // Если веса нет, статус не показываем
-    
+    if (!currentWeight) return null;
     if (ideal && ideal.isPuppyKitten) {
-        return { 
-            className: "weight-normal", 
-            text: "🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара." 
-        };
+        return { className: "weight-normal", text: "🐾 Питомец растёт! Вес оценивается индивидуально у ветеринара." };
     }
-    
-    if (!ideal) return null; // Если это взрослый, но нет данных для расчёта
-    
+    if (!ideal) return null;
     if (currentWeight < ideal.min) return { className: "weight-low", text: `Недобор веса. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
     if (currentWeight > ideal.max) return { className: "weight-high", text: `Избыточный вес. Норма для взрослого: ${ideal.min}–${ideal.max} кг` };
     return { className: "weight-normal", text: `Вес в норме. Идеальный диапазон: ${ideal.min}–${ideal.max} кг` };
@@ -378,7 +375,7 @@ function renderProfile() {
                 <div><b>Содержание:</b> ${escapeHtml(pet.housing || "—")}</div>
                 <div><b>Телосложение:</b> ${escapeHtml(pet.bodyType || "—")}</div>
                 <div><b>Рост:</b> ${pet.height || "—"} см</div>
-                <div><b>BCS:</b> ${pet.bcs || "—"}</div>
+                <div><b><span class="tooltip" data-tip="Body Condition Score — система оценки упитанности от 1 до 9. Норма = 5.">BCS</span>:</b> ${pet.bcs || "—"}</div>
                 <div><b>Последний вес:</b> ${latestWeight ? `${Number(latestWeight.value).toFixed(1)} кг` : "ещё нет"}</div>
             </div>
             ${weightStatus ? `<div class="weight-status ${weightStatus.className}">${weightStatus.text}</div>` : ""}
@@ -391,7 +388,13 @@ function renderProfile() {
                 <tr><td>Рост</td><td>${pet.height || "—"} см</td></tr>
                 <tr><td>BCS</td><td>${pet.bcs || "—"}</td></tr>
             </table>` : ""}
-            <div class="pet-actions">
+            
+            <div style="margin-top:16px; padding:14px; background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0;">
+                <h4 style="margin:0 0 8px 0; font-size:16px;"><span class="tooltip" data-tip="Здесь можно указать аллергии, особенности поведения, любимые лакомства или любые другие важные заметки о питомце">Дополнительные сведения</span></h4>
+                <p style="margin:0; color:var(--text); white-space:pre-wrap; font-size:14px; line-height:1.5;">${pet.notes || "Нет дополнительных сведений"}</p>
+            </div>
+
+            <div class="pet-actions" style="margin-top:16px;">
                 <button class="btn" onclick="editCurrentPet()">Редактировать</button>
                 <button class="btn btn-danger" onclick="deleteCurrentPet()">Удалить</button>
             </div>
@@ -400,6 +403,7 @@ function renderProfile() {
     renderWeightList();
     drawWeightChart();
 }
+
 function editCurrentPet() { const i = currentPetIndex(); if (i !== null) openPetModal(i); }
 function deleteCurrentPet() { const i = currentPetIndex(); if (i !== null) deletePet(i); }
 
@@ -492,7 +496,7 @@ function drawWeightChart() {
 function updateEventPetSelect(selectedId = "") {
     const select = document.getElementById("eventPetId");
     if (!select) return;
-    select.innerHTML = '<option value="">Для всех питомцев / Общее</option>';
+    select.innerHTML = '<option value="">Для всех питомцев</option>';
     pets.forEach((pet, idx) => {
         const opt = document.createElement("option");
         opt.value = String(idx); opt.textContent = pet.name;
@@ -500,6 +504,7 @@ function updateEventPetSelect(selectedId = "") {
         select.appendChild(opt);
     });
 }
+
 function openEventModal(date = todayISO(), index = null) {
     const modal = document.getElementById("eventModal"); if (!modal) return;
     const title = document.getElementById("eventModalTitle"),
@@ -515,7 +520,7 @@ function openEventModal(date = todayISO(), index = null) {
     } else {
         const item = events[index];
         eventIndex.value = String(index); eventDate.value = item.date;
-        eventType.value = item.type; eventTitle.value = item.title;
+        eventType.value = item.type; eventTitle.value = item.title === "Событие" ? "" : item.title;
         updateEventPetSelect(item.petId !== undefined ? String(item.petId) : "");
         title.textContent = "Редактировать событие";
     }
@@ -531,14 +536,17 @@ function saveEvent() {
           eventType = document.getElementById("eventType"),
           eventTitle = document.getElementById("eventTitle"),
           eventPetId = document.getElementById("eventPetId");
-    const date = eventDate.value, type = eventType.value, title = eventTitle.value.trim();
+    const date = eventDate.value, type = eventType.value;
+    const title = eventTitle.value.trim() || "Событие"; // Описание теперь необязательно
     const petId = eventPetId ? (eventPetId.value === "" ? null : Number(eventPetId.value)) : null;
+    
     if (!date) { alert("Выбери дату."); return; }
-    if (!title) { alert("Напиши описание события."); return; }
+    
     const item = { id: Date.now() + Math.random(), date, type, title, petId };
     const index = eventIndex.value === "" ? null : Number(eventIndex.value);
     if (index === null) events.push(item);
     else events[index] = { ...events[index], date, type, title, petId };
+    
     saveState(); closeEventModal();
     renderCalendar(); renderEventList(); renderUpcomingEvents();
 }
@@ -548,10 +556,11 @@ function deleteEvent(index) {
     events.splice(index, 1); saveState();
     renderCalendar(); renderEventList(); renderUpcomingEvents();
 }
+
 function renderUpcomingEvents() {
     const container = document.getElementById("upcomingEvents");
     if (!container) return;
-    const upcoming = getMergedUpcoming().slice(0, 5);
+    const upcoming = getMergedUpcoming().slice(0, 3); // ИЗМЕНЕНО: показываем только 3 ближайших
     if (!upcoming.length) {
         container.innerHTML = `<div class="empty-state">Пока нет ближайших событий.</div>`;
         return;
@@ -577,11 +586,11 @@ function renderUpcomingEvents() {
         </div>`;
     }).join("");
 }
+
 function renderCalendar() {
     const title = document.getElementById("calendarMonthTitle"), grid = document.getElementById("calendarGrid");
     if (!title || !grid) return;
-    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-                        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
     title.textContent = `${monthNames[currentMonthView]} ${currentYearView}`;
     grid.innerHTML = "";
     const firstDay = new Date(currentYearView, currentMonthView, 1).getDay(),
@@ -640,6 +649,7 @@ function nextMonth() {
     if (currentMonthView > 11) { currentMonthView = 0; currentYearView++; }
     renderCalendar();
 }
+
 function renderEventList() {
     const container = document.getElementById("eventList");
     if (!container) return;
@@ -676,10 +686,10 @@ function setDefaultDateInputs() {
 // ===== ТУР (ПОДСКАЗКИ) =====
 const TOUR_STEPS = {
     "index.html": [
-        { selector: "[data-tour='hero']", title: "Добро пожаловать!", text: "Это главная страница Pet Tracker. Здесь ты видишь своих питомцев и ближайшие события." },
+        { selector: "[data-tour='hero']", title: "Добро пожаловать!", text: "Это главная страница Pet Tracker. Здесь ты видишь своих питомцев и 3 ближайших события." },
         { selector: "[data-tour='addPetBtn']", title: "Добавить питомца", text: "Нажми сюда, чтобы добавить своего первого питомца." },
         { selector: "[data-tour='petsGrid']", title: "Список питомцев", text: "Здесь появятся все твои питомцы. Кликни на карточку, чтобы открыть профиль." },
-        { selector: "[data-tour='upcoming']", title: "Ближайшие события", text: "Здесь отображаются ближайшие события: вакцины, дни рождения, визиты к ветеринару." }
+        { selector: "[data-tour='upcoming']", title: "Ближайшие события", text: "Здесь отображаются 3 ближайших события. Нажми кнопку ниже, чтобы увидеть все в календаре." }
     ],
     "pets.html": [
         { selector: "[data-tour='hero']", title: "Управление питомцами", text: "На этой странице ты можешь добавлять, редактировать и удалять питомцев." },
@@ -690,16 +700,16 @@ const TOUR_STEPS = {
     ],
     "calendar.html": [
         { selector: "[data-tour='hero']", title: "Календарь событий", text: "Здесь ты видишь все запланированные события на месяц." },
-        { selector: "[data-tour='addEventBtn']", title: "Добавить событие", text: "Добавь вакцинацию, визит к ветеринару, прогулку или другое событие." },
+        { selector: "[data-tour='addEventBtn']", title: "Добавить событие", text: "Добавь вакцинацию, визит к ветеринару, прогулку или другое событие для конкретного питомца или для всех." },
         { selector: "[data-tour='prevMonth']", title: "Навигация", text: "Переключайся между месяцами стрелками. Дни рождения питомцев добавляются автоматически." },
         { selector: "[data-tour='calendarGrid']", title: "Сетка календаря", text: "Кликни на любой день, чтобы быстро добавить событие на эту дату." },
         { selector: "[data-tour='eventList']", title: "Все события", text: "Полный список всех событий с возможностью редактирования." }
     ],
     "profile.html": [
-        { selector: "[data-tour='profileCard']", title: "Профиль питомца", text: "Здесь вся информация о питомце: фото, возраст, вес и параметры." },
+        { selector: "[data-tour='profileCard']", title: "Профиль питомца", text: "Здесь вся информация о питомце: фото, возраст, вес, BCS и дополнительные сведения." },
         { selector: "[data-tour='measurement']", title: "Как измерять", text: "Подсказки, как правильно измерять рост, BCS и определять тип телосложения." },
         { selector: "[data-tour='weightChart']", title: "График веса", text: "Наглядный график изменения веса питомца по времени." },
-        { selector: "[data-tour='weightHistory']", title: "История веса", text: "Добавляй новые записи веса и отслеживай динамику. Система подскажет, в норме ли вес." }
+        { selector: "[data-tour='weightHistory']", title: "История веса", text: "Добавляй новые записи веса и отслеживай динамику." }
     ]
 };
 
