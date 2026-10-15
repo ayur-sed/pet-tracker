@@ -20,7 +20,7 @@
         <section class="hero panel" data-tour="hero">
             <div>
                 <h1>Календарь</h1>
-                <p>Вакцины, ветеринар, прогулки и другое.</p>
+                <p>Вакцины, дни рождения, ветеринар, прогулки и другое.</p>
             </div>
             <button class="btn" data-tour="addEventBtn" onclick="openEventModal()">+ Добавить событие</button>
         </section>
@@ -40,32 +40,33 @@
             <div id="eventList" class="stack" data-tour="eventList"></div>
         </section>
     </main>
-</div>
-
-<!-- МОДАЛКА СОБЫТИЯ -->
-<div id="eventModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-top">
-            <h3 id="eventModalTitle">Добавить событие</h3>
-            <button class="icon-btn" onclick="closeEventModal()">✕</button>
-        </div>
-        <input type="hidden" id="eventIndex">
-        <input id="eventDate" type="date">
-        <select id="eventType">
-            <option value="vaccine">Вакцина</option>
-            <option value="vet">Ветеринар</option>
-            <option value="walk">Прогулка</option>
-            <option value="medicine">Лекарства</option>
-            <option value="other">Другое</option>
-        </select>
-        <input id="eventTitle" type="text" placeholder="Что нужно сделать?">
-        <div class="modal-actions">
-            <button class="btn" onclick="saveEvent()">Сохранить</button>
-            <button class="btn btn-light" onclick="closeEventModal()">Отмена</button>
+    <!-- МОДАЛКА СОБЫТИЯ -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3 id="eventModalTitle">Добавить событие</h3>
+                <button class="icon-btn" onclick="closeEventModal()">✕</button>
+            </div>
+            <input type="hidden" id="eventIndex">
+            <input id="eventDate" type="date">
+            <select id="eventPetId">
+                <option value="">Для всех питомцев</option>
+            </select>
+            <select id="eventType">
+                <option value="vaccine">Вакцина</option>
+                <option value="vet">Ветеринар</option>
+                <option value="walk">Прогулка</option>
+                <option value="medicine">Лекарства</option>
+                <option value="other">Другое</option>
+            </select>
+            <input id="eventTitle" type="text" placeholder="Описание (необязательно)">
+            <div class="modal-actions">
+                <button class="btn" onclick="saveEvent()">Сохранить</button>
+                <button class="btn btn-light" onclick="closeEventModal()">Отмена</button>
+            </div>
         </div>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>
