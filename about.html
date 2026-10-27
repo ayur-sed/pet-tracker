@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Трекер питомца — О программе</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <h2>🐾 Трекер питомца</h2>
+        <nav class="menu">
+            <a href="index.html">Главная</a>
+            <a href="pets.html">Питомцы</a>
+            <a href="calendar.html">Календарь</a>
+            <a href="about.html" class="active">О программе</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
+        </nav>
+        <div class="theme-switcher" data-tour="themeSwitcher">
+            <button class="btn btn-light theme-btn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+            </button>
+        </div>
+    </aside>
+    <main class="content">
+        <section class="hero panel" data-tour="hero">
+            <div>
+                <h1>О программе</h1>
+                <p>Всё, что нужно знать о Трекере питомца: как измерять, как считать, как пользоваться.</p>
+            </div>
+        </section>
+
+        <!-- Навигация-якоря -->
+        <section class="panel about-nav" data-tour="aboutNav">
+            <h2>📌 Разделы</h2>
+            <div class="about-nav-grid">
+                <a href="#about" class="about-nav-link">🐾 О программе</a>
+                <a href="#bcs" class="about-nav-link">📊 Индекс BCS</a>
+                <a href="#height" class="about-nav-link">📏 Как измерить рост</a>
+                <a href="#bodytype" class="about-nav-link">🦴 Типы телосложения</a>
+                <a href="#calendar" class="about-nav-link">📅 Календарь событий</a>
+                <a href="#weight" class="about-nav-link">⚖️ Как считается идеальный вес</a>
+            </div>
+        </section>
+
+        <!-- О программе -->
+        <section id="about" class="panel" data-tour="aboutSection">
+            <h2>🐾 Что такое Трекер питомца?</h2>
+            <p><b>Трекер питомца</b> — это удобное веб-приложение, которое помогает владельцам домашних животных следить за здоровьем, весом, событиями и важными датами.</p>
+            <ul class="about-list">
+                <li>✅ Храните анкеты всех питомцев в одном месте</li>
+                <li>✅ Отслеживайте вес и рост на графиках</li>
+                <li>✅ Планируйте вакцинации, визиты к ветеринару, прогулки</li>
+                <li>✅ Получайте автоматические напоминания о днях рождения</li>
+                <li>✅ Рассчитывайте идеальный вес по росту и типу телосложения</li>
+                <li>✅ Экспортируйте и импортируйте данные в JSON</li>
+            </ul>
+            <p class="about-note">💡 Все данные хранятся локально в вашем браузере. Ничего не отправляется на сервер.</p>
+        </section>
+
+        <!-- BCS -->
+        <section id="bcs" class="panel" data-tour="bcsSection">
+            <h2>📊 BCS — Body Condition Score</h2>
+            <p><b>BCS (индекс кондиции тела)</b> — это система оценки упитанности питомца по шкале от 1 до 9.</p>
+            <ul class="about-list">
+                <li><b>1</b> — Истощение</li>
+                <li><b>3</b> — Недобор веса</li>
+                <li><b>5</b> — ✅ Идеальная норма</li>
+                <li><b>7</b> — Избыточный вес</li>
+                <li><b>9</b> — Сильное ожирение</li>
+            </ul>
+            <p><b>Как оценить:</b></p>
+            <ul class="about-list">
+                <li>👉 Рёбра должны прощупываться, но не быть видны</li>
+                <li>👉 Талия выражена при взгляде сверху</li>
+                <li>👉 Живот подтянут при взгляде сбоку</li>
+            </ul>
+                         <div class="image-placeholder">
+                            <img src="images/body-condition-score.jpg" alt="Шкала BCS от 1 до 9" style="max-width:100%; border-radius:12px;">
+                         </div>
+            
+            <p class="about-note"><i>Источник: WSAVA Global Nutrition Guidelines</i></p>
+        </section>
+
+        <!-- Рост -->
+        <section id="height" class="panel" data-tour="heightSection">
+            <h2>📏 Как измерить рост питомца</h2>
+            <p><b>Рост (высота в холке)</b> — это расстояние от пола до самой верхней точки холки, когда питомец стоит ровно на четырёх лапах.</p>
+            <p><b>Как измерять:</b></p>
+            <ul class="about-list">
+                <li>1️⃣ Поставьте питомца на ровную твёрдую поверхность</li>
+                <li>2️⃣ Дождитесь, когда он встанет ровно, голова прямо</li>
+                <li>3️⃣ Найдите холку — самую высокую точку между лопатками</li>
+                <li>4️⃣ Измерьте расстояние от пола до этой точки линейкой или рулеткой</li>
+            </ul>
+                        
+                         <div class="image-placeholder">
+                            <img src="images/heigh.webp" alt="измерение роста" style="max-width:100%; border-radius:12px;">
+                        </div>
+            <p class="about-note">💡 Если не знаете точный рост — нажмите «Не знаю» в анкете, программа подставит среднее значение для выбранного типа телосложения.</p>
+        </section>
+
+        <!-- Типы телосложения -->
+        <section id="bodytype" class="panel" data-tour="bodytypeSection">
+            <h2>🦴 Типы телосложения</h2>
+           <p>Лёгкое — худощавое. Среднее — стандарт. Крупное — массивное. Коротколапое — удлинённое тело на коротких лапах (у собак: такса, корги; у кошек: манчкин, наполеон).</p>
+           
+            <h3>🐕 Для собак</h3>
+            <div class="bodytype-grid">
+                <div class="bodytype-card">
+                    <h4>Лёгкое (мелкие породы)</h4>
+                    <p>Худощавое, изящное телосложение. Рост: 20–35 см. Вес: 3–8 кг.</p>
+                    <p><b>Примеры пород:</b> той-терьер, чихуахуа, итальянская борзая, пражец.</p>
+                    <div class="image-placeholder">
+                        <img src="images/bodytype/dog-light.webp" alt="Собака лёгкого типа" style="max-width:100%; border-radius:12px;">
+                    </div>
+                </div>
+                <div class="bodytype-card">
+                    <h4>Среднее</h4>
+                    <p>Классическое квадратное телосложение. Рост: 35–55 см. Вес: 8–25 кг.</p>
+                    <p><b>Примеры пород:</b> бигль, кокер-спаниель, шелти, французский бульдог.</p>
+                    <div class="image-placeholder">
+                        <img src="images/bodytype/dog-medium.jpg" alt="Собака лёгкого типа" style="max-width:100%; border-radius:12px;">
+                    </div>
+                </div>
+                <div class="bodytype-card">
+                    <h4>Крупное</h4>
+                    <p>Массивное, мощное телосложение. Рост: 55–75 см. Вес: 25–45 кг.</p>
+                    <p><b>Примеры пород:</b> лабрадор, немецкая овчарка, хаски, ротвейлер.</p>
+                    <div class="image-placeholder">
+                        <img src="images/bodytype/dog-big.jpg" alt="Собака лёгкого типа" style="max-width:100%; border-radius:12px;">
+                    </div>
+                </div>
+                <div class="bodytype-card">
+                    <h4>Коротколапое (прямоугольное)</h4>
+                    <p>Удлинённое тело на коротких лапах. Рост: 15–30 см. Вес: 5–15 кг.</p>
+                    <p><b>Примеры пород:</b> такса, корги, бассет-хаунд.</p>
+                    <div class="image-placeholder">
+                        <img src="images/bodytype/dog-short.jpg" alt="Собака лёгкого типа" style="max-width:100%; border-radius:12px;">
+                    </div>
+                </div>
+            </div>
+
+            <h3>🐈 Для кошек</h3>
+              <div class="bodytype-grid">
+                  <div class="bodytype-card">
+                      <h4>Лёгкое</h4>
+                      <p>Изящное, утончённое. Вес: 3–4,5 кг.</p>
+                      <p><b>Примеры пород:</b> сиамская, ориентальная, абиссинская, бурма.</p>
+                      <div class="image-placeholder">
+                          <img src="images/bodytype/light.jpg" alt="Манчкин" style="max-width:100%; border-radius:12px;">
+                      </div>
+                  </div>
+                  <div class="bodytype-card">
+                      <h4>Среднее</h4>
+                      <p>Стандартное, гармоничное. Вес: 4–6 кг.</p>
+                      <p><b>Примеры пород:</b> британская короткошёрстная, русская голубая.</p>
+                      <div class="image-placeholder">
+                          <img src="images/bodytype/medium.jpg" alt="Манчкин" style="max-width:100%; border-radius:12px;"> 
+                      </div>
+                  </div>
+                  <div class="bodytype-card">
+                      <h4>Крупное</h4>
+                      <p>Массивное, мускулистое. Вес: 5–9 кг.</p>
+                      <p><b>Примеры пород:</b> мейн-кун, норвежская лесная, сибирская, рэгдолл.</p>
+                      <div class="image-placeholder">
+                          <img src="images/bodytype/big.jpg" alt="Манчкин" style="max-width:100%; border-radius:12px;"> 
+                      </div>
+                  </div>
+                  <div class="bodytype-card">
+                      <h4>Коротколапое</h4>
+                      <p>Удлинённое тело на коротких лапах. Вес: 2,5–4,5 кг.</p>
+                      <p><b>Примеры пород:</b> 🐱 <b>манчкин</b>, наполеон (менуэт).</p>
+                      <p class="about-note">💡 У коротколапых кошек тело прямоугольной формы, а не квадратной — это важно при оценке упитанности.</p>
+                      <div class="image-placeholder">
+                        
+                         <img src="images/bodytype/munchkin.jpg" alt="Манчкин" style="max-width:100%; border-radius:12px;"> 
+                            
+                        </div> 
+                  </div>
+              </div>
+            <p class="about-note">💡 Для других видов животных (птицы, грызуны, рептилии) расчёт идеального веса пока не реализован — информация появится в следующих версиях после тестирования на реальных моделях.</p>
+        </section>
+
+        <!-- Календарь -->
+        <section id="calendar" class="panel" data-tour="calendarSection">
+            <h2>📅 Календарь событий</h2>
+            <p>Календарь помогает не пропустить важные даты и события в жизни питомца.</p>
+            <p><b>Какие бывают события:</b></p>
+            <ul class="about-list">
+                <li>💉 <b>Вакцина</b> — напоминание о вакцинации</li>
+                <li>🩺 <b>Ветеринар</b> — плановый или внеплановый визит</li>
+                <li>🚶 <b>Прогулка</b> — регулярные выгулы</li>
+                <li>💊 <b>Лекарства</b> — курс лечения</li>
+                <li>🎂 <b>День рождения</b> — добавляется автоматически</li>
+                <li>📌 <b>Другое</b> — любое событие</li>
+            </ul>
+            <p><b>Повторяющиеся события:</b></p>
+            <ul class="about-list">
+                <li>🔁 Можно указать, что событие повторяется каждые N дней / недель / месяцев</li>
+                <li>🔁 Можно задать конечную дату или оставить «бесконечно»</li>
+                <li>🔁 Пример: «Обработка от клещей каждые 4 недели»</li>
+            </ul>
+            <p><b>Навигация:</b></p>
+            <ul class="about-list">
+                <li>◀ ▶ — переключение между месяцами</li>
+                <li>🖱️ Клик на день — быстрое добавление события</li>
+                <li>📋 Если событий в дне много — откроется модальное окно со списком</li>
+            </ul>
+        </section>
+
+        <!-- Идеальный вес -->
+        <section id="weight" class="panel" data-tour="weightSection">
+            <h2>⚖️ Как рассчитывается идеальный вес</h2>
+            <p>Идеальный вес рассчитывается на основе <b>роста</b> и <b>типа телосложения</b>.</p>
+            <p><b>Для собак:</b></p>
+            <ul class="about-list">
+                <li>Лёгкое: рост × 0,15 … рост × 0,35</li>
+                <li>Среднее: рост × 0,20 … рост × 0,35</li>
+                <li>Крупное: рост × 0,25 … рост × 0,50</li>
+                <li>Коротколапое: рост × 0,30 … рост × 0,55</li>
+            </ul>
+                  <p><b>Для кошек:</b></p>
+                  <ul class="about-list">
+                      <li>Лёгкое: рост × 0,12 … рост × 0,18</li>
+                      <li>Среднее: рост × 0,14 … рост × 0,21</li>
+                      <li>Крупное: рост × 0,16 … рост × 0,25</li>
+                      <li>Коротколапое (манчкин, наполеон): рост × 0,18 … рост × 0,28</li>
+                  </ul>
+            <p class="about-note">⚠️ Для щенков и котят до 1 года расчёт не применяется — они растут, и вес оценивается индивидуально у ветеринара.</p>
+            <p class="about-note">💡 Если рост не указан — берётся среднее значение для выбранного типа телосложения.</p>
+        </section>
+    </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

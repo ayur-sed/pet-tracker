@@ -2,19 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Pet Tracker — Календарь</title>
+    <title>Трекер питомца — Календарь</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
     <aside class="sidebar">
-        <h2>🐾 Pet Tracker</h2>
+        <h2>🐾 Трекер питомца</h2>
         <nav class="menu">
             <a href="index.html">Главная</a>
             <a href="pets.html">Питомцы</a>
             <a class="active" href="calendar.html">Календарь</a>
             <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
+            <a href="about.html">О программе</a>
         </nav>
+        <div class="theme-switcher" data-tour="themeSwitcher">
+            <button class="btn btn-light theme-btn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+            </button>
+        </div>
     </aside>
     <main class="content">
         <section class="hero panel" data-tour="hero">
@@ -40,6 +46,7 @@
             <div id="eventList" class="stack" data-tour="eventList"></div>
         </section>
     </main>
+    
     <!-- МОДАЛКА СОБЫТИЯ -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
@@ -60,10 +67,52 @@
                 <option value="other">Другое</option>
             </select>
             <input id="eventTitle" type="text" placeholder="Описание (необязательно)">
+            <div class="repeat-section">
+                <label class="repeat-label">🔁 Повторение:</label>
+                <select id="eventRepeat">
+                    <option value="none">Не повторять</option>
+                    <option value="daily">Каждый день</option>
+                    <option value="weekly">Каждую неделю</option>
+                    <option value="monthly">Каждый месяц</option>
+                    <option value="custom">Каждые N дней/недель/месяцев</option>
+                </select>
+                <div id="customRepeatBlock" style="display:none; margin-top:8px;">
+                    <div class="custom-repeat-row">
+                        <span>Каждые</span>
+                        <input id="repeatEvery" type="number" min="1" value="1" style="width:70px;">
+                        <select id="repeatUnit">
+                            <option value="days">дней</option>
+                            <option value="weeks">недель</option>
+                            <option value="months">месяцев</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="repeatEndBlock" style="display:none; margin-top:8px;">
+                    <label class="repeat-label">Закончить:</label>
+                    <select id="repeatEnd">
+                        <option value="never">Бесконечно</option>
+                        <option value="date">До даты</option>
+                        <option value="count">После N повторений</option>
+                    </select>
+                    <input id="repeatEndDate" type="date" style="display:none; margin-top:6px;">
+                    <input id="repeatEndCount" type="number" min="1" value="5" style="display:none; margin-top:6px; width:100px;">
+                </div>
+            </div>
             <div class="modal-actions">
                 <button class="btn" onclick="saveEvent()">Сохранить</button>
                 <button class="btn btn-light" onclick="closeEventModal()">Отмена</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- МОДАЛКА ДНЯ -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3 id="dayModalTitle">События дня</h3>
+                <button class="icon-btn" onclick="closeDayModal()">✕</button>
+            </div>
+            <div id="dayModalList" class="stack"></div>
         </div>
     </div>
 </div>

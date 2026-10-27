@@ -2,24 +2,29 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Pet Tracker — Профиль</title>
+    <title>Трекер питомца — Профиль</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="app">
     <aside class="sidebar">
-        <h2>🐾 Pet Tracker</h2>
+        <h2>🐾 Трекер питомца</h2>
         <nav class="menu">
-            <a href="index.html">Главная</a>
-            <a href="pets.html">Питомцы</a>
-            <a href="calendar.html">Календарь</a>
-            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
-        </nav>
+    <a href="index.html">Главная</a>
+    <a class="active" href="pets.html">Питомцы</a> <!-- или profile.html -->
+    <a href="calendar.html">Календарь</a>
+    <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
+    <a href="about.html">О программе</a>
+</nav>
+        <div class="theme-switcher" data-tour="themeSwitcher">
+            <button class="btn btn-light theme-btn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+            </button>
+        </div>
     </aside>
     <main class="content">
         <section id="profileCard" data-tour="profileCard"></section>
-
         <section class="panel measurement-panel" data-tour="measurement">
             <h2>Как измерять питомца</h2>
             <div class="measurement-grid">
@@ -32,20 +37,22 @@
                     <p>Оцени рёбра, талию и живот. При норме (5) рёбра прощупываются, но не видны, талия выражена.</p>
                     <p style="font-size:12px; color:var(--muted); margin-top:8px; border-top:1px solid #dbeafe; padding-top:8px;">
                         <i>Источник: WSAVA Global Nutrition Guidelines</i>
-                   6</p>
+                    </p>
                 </div>
                 <div class="measurement-card">
                     <h3>Тип телосложения</h3>
-                    <p>Лёгкое — худощавое. Среднее — стандарт. Тяжёлое — массивное.</p>
-                </idv>
+                    <p>Лёгкое — худощавое. Среднее — стандарт. Крупное — массивное. Коротколапое — удлинённое тело на коротких лапах.</p>
+                </div>
             </div>
         </section>
-
         <section class="panel" data-tour="weightChart">
             <h2>График веса</h2>
             <canvas id="weightChart" height="50"></canvas>
         </section>
-
+        <section class="panel" data-tour="heightChart" id="heightChartSection" style="display:none;">
+            <h2>График роста</h2>
+            <canvas id="heightChart" height="50"></canvas>
+        </section>
         <section class="panel" data-tour="weightHistory">
             <div class="section-head">
                 <h2>История веса</h2>
@@ -56,58 +63,14 @@
             </div>
             <ul id="weightList" class="record-list"></ul>
         </section>
+        <section class="panel" data-tour="heightHistory" id="heightHistorySection" style="display:none;">
+            <div class="section-head">
+                <h2>История роста</h2>
+                <button class="btn" onclick="openHeightModal()">+ Добавить рост</button>
+            </div>
+            <ul id="heightList" class="record-list"></ul>
+        </section>
     </main>
-
-    <!-- МОДАЛКА ПИТОМЦА (для редактирования) -->
-    <div id="petModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-top">
-                <h3 id="petModalTitle">Редактировать питомца</h3>
-                <button class="icon-btn" onclick="closePetModal()">✕</button>
-            </div>
-            <input type="hidden" id="petIndex">
-            <input id="petName" type="text" placeholder="Имя питомца">
-            <select id="petSpecies" onchange="toggleSpeciesFields()">
-                <option value="">Вид животного</option>
-                <option value="Собака">Собака</option>
-                <option value="Кошка">Кошка</option>
-            </select>
-            <select id="petBodyType"><option value="">Тип телосложения</option></select>
-            <input id="petHeight" type="number" min="0" step="0.1" placeholder="Рост в холке (см)">
-            <select id="petBCS">
-                <option value="">BCS — индекс кондиции</option>
-                <option value="1">1 — Истощение</option>
-                <option value="2">2 — Сильный недобор</option>
-                <option value="3">3 — Недобор</option>
-                <option value="4">4 — Ниже нормы</option>
-                <option value="5">5 — Норма</option>
-                <option value="6">6 — Небольшой избыток</option>
-                <option value="7">7 — Избыточный вес</option>
-                <option value="8">8 — Ожирение</option>
-                <option value="9">9 — Сильное ожирение</option>
-            </select>
-            <select id="petGender">
-                <option value="">Пол</option>
-                <option value="Самец">Самец</option>
-                <option value="Самка">Самка</option>
-            </select>
-            <input id="petBirthDate" type="date">
-            <select id="petHousing">
-                <option value="">Содержание питомца</option>
-                <option value="Квартира">Квартира</option>
-                <option value="Свободный выгул">Свободный выгул</option>
-            </select>
-            <textarea id="petNotes" placeholder="Дополнительные сведения (аллергии, особенности поведения и т.д.)" style="width:100%; min-height:80px; padding:12px; border:1px solid var(--border); border-radius:14px; font-family:inherit; resize:vertical; outline:none;"></textarea>
-            <div class="photo-box">
-                <img id="petPhotoPreview" alt="Фото питомца">
-            </div>
-            <input id="petPhoto" type="file" accept="image/*">
-            <div class="modal-actions">
-                <button class="btn" onclick="savePet()">Сохранить</button>
-                <button class="btn btn-light" onclick="closePetModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
 
     <!-- МОДАЛКА ВЕСА -->
     <div id="weightModal" class="modal">
@@ -124,6 +87,51 @@
                 <button class="btn" onclick="saveWeight()">Сохранить</button>
                 <button class="btn btn-light" onclick="closeWeightModal()">Отмена</button>
             </div>
+        </div>
+    </div>
+    <!-- МОДАЛКА РОСТА -->
+    <div id="heightModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3 id="heightModalTitle">Добавить рост</h3>
+                <button class="icon-btn" onclick="closeHeightModal()">✕</button>
+            </div>
+            <input type="hidden" id="heightIndex">
+            <input id="heightDate" type="date">
+            <input id="heightValue" type="number" min="0" step="0.1" placeholder="Рост, см">
+            <div class="hint-inline">Вводи рост в сантиметрах, например: 25.5</div>
+            <div class="modal-actions">
+                <button class="btn" onclick="saveHeight()">Сохранить</button>
+                <button class="btn btn-light" onclick="closeHeightModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <div id="approxAgeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3>Примерный возраст</h3>
+                <button class="icon-btn" onclick="closeApproxAgeModal()">✕</button>
+            </div>
+            <p class="small">Выберите, что вы знаете о дате рождения:</p>
+            <button class="btn btn-light" onclick="approxAge('day')">Знаю точный день, но не уверен в годе</button>
+            <button class="btn btn-light" onclick="approxAge('month')">Знаю только месяц</button>
+            <button class="btn btn-light" onclick="approxAge('season')">Знаю только время года</button>
+            <button class="btn btn-light" onclick="approxAge('unknown')">Вообще не знаю</button>
+            <div class="modal-actions">
+                <button class="btn btn-light" onclick="closeApproxAgeModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <div id="seasonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3>Выберите время года</h3>
+                <button class="icon-btn" onclick="closeSeasonModal()">✕</button>
+            </div>
+            <button class="btn btn-light" onclick="setSeason(3, 'Весна')">🌸 Весна (март)</button>
+            <button class="btn btn-light" onclick="setSeason(6, 'Лето')">☀️ Лето (июнь)</button>
+            <button class="btn btn-light" onclick="setSeason(9, 'Осень')">🍂 Осень (сентябрь)</button>
+            <button class="btn btn-light" onclick="setSeason(12, 'Зима')">❄️ Зима (декабрь)</button>
         </div>
     </div>
 </div>
