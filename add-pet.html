@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Трекер питомца — Анкета</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <h2>🐾 Трекер питомца</h2>
+        <nav class="menu">
+            <a href="index.html">Главная</a>
+            <a href="pets.html">Питомцы</a>
+            <a href="calendar.html">Календарь</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
+            <a href="about.html">О программе</a>
+        </nav>
+        <div class="theme-switcher" data-tour="themeSwitcher">
+            <button class="btn btn-light theme-btn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+            </button>
+        </div>
+    </aside>
+    <main class="content add-pet-content">
+        <section class="hero panel" data-tour="hero">
+            <div>
+                <h1 id="addPetTitle">Добавить питомца</h1>
+                <p>Заполни анкету — это поможет точно рассчитать идеальный вес.</p>
+            </div>
+        </section>
+        <section class="panel add-pet-form-panel" data-tour="addPetForm">
+            <input type="hidden" id="petIndex">
+            <div class="form-grid">
+                <div class="form-column">
+                    <label class="form-label">Имя питомца</label>
+                    <input id="petName" type="text" placeholder="Например: Барсик">
+                    
+                    <label class="form-label">Вид животного</label>
+                    <select id="petSpecies" onchange="toggleSpeciesFields()">
+                        <option value="">Выбери вид</option>
+                        <option value="Собака">Собака</option>
+                        <option value="Кошка">Кошка</option>
+                        <option value="Другое">Другое (пока без расчёта веса)</option>
+                    </select>
+                    <div class="hint-inline" id="speciesHint"></div>
+                    
+                    <label class="form-label">Тип телосложения</label>
+                    <select id="petBodyType" onchange="updateHeightHint()">
+                        <option value="">Выбери тип</option>
+                    </select>
+                    <div class="hint-inline" id="bodyTypeHint"></div>
+                    
+                    <label class="form-label">Рост в холке (см)</label>
+                    <div class="height-row">
+                        <input id="petHeight" type="number" min="0" step="0.1" placeholder="Например: 35">
+                        <button class="btn btn-light" type="button" onclick="askHeightLater()">Не знаю</button>
+                    </div>
+                    <div class="hint-inline" id="heightHint"></div>
+                    
+                    <label class="form-label">BCS — индекс кондиции</label>
+                    <select id="petBCS">
+                        <option value="">Выбери BCS</option>
+                        <option value="1">1 — Истощение</option>
+                        <option value="2">2 — Сильный недобор</option>
+                        <option value="3">3 — Недобор</option>
+                        <option value="4">4 — Ниже нормы</option>
+                        <option value="5">5 — Норма</option>
+                        <option value="6">6 — Небольшой избыток</option>
+                        <option value="7">7 — Избыточный вес</option>
+                        <option value="8">8 — Ожирение</option>
+                        <option value="9">9 — Сильное ожирение</option>
+                    </select>
+                </div>
+                
+                <div class="form-column">
+                    <label class="form-label">Пол</label>
+                    <select id="petGender">
+                        <option value="">Выбери пол</option>
+                        <option value="Самец">Самец</option>
+                        <option value="Самка">Самка</option>
+                    </select>
+                    
+                    <label class="form-label">Дата рождения</label>
+                    <div class="birth-row">
+                        <input id="petBirthDate" type="date">
+                        <button class="btn btn-light" type="button" onclick="openApproxAgeModal()">Примерный возраст</button>
+                    </div>
+                    <div class="hint-inline" id="birthHint"></div>
+                    
+                    <label class="form-label">Содержание питомца</label>
+                    <select id="petHousing">
+                        <option value="">Выбери тип содержания</option>
+                        <option value="Квартира">Квартира</option>
+                        <option value="Свободный выгул">Свободный выгул</option>
+                    </select>
+                    
+                    <label class="form-label">Дополнительные сведения</label>
+                    <textarea id="petNotes" placeholder="Аллергии, особенности поведения и т.д." rows="4"></textarea>
+                    
+                    <label class="form-label">Фото питомца</label>
+                    <div class="photo-box">
+                        <img id="petPhotoPreview" alt="Фото питомца">
+                    </div>
+                    <input id="petPhoto" type="file" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn" onclick="savePet()">💾 Сохранить</button>
+                <button class="btn btn-light" onclick="cancelAddPet()">Отмена</button>
+            </div>
+        </section>
+    </main>
+    
+    <!-- МОДАЛКА ПРИМЕРНОГО ВОЗРАСТА -->
+    <div id="approxAgeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3>Примерный возраст</h3>
+                <button class="icon-btn" onclick="closeApproxAgeModal()">✕</button>
+            </div>
+            <p class="small">Выберите, что вы знаете о дате рождения:</p>
+            <button class="btn btn-light" onclick="approxAge('day')">Знаю точный день, но не уверен в годе</button>
+            <button class="btn btn-light" onclick="approxAge('month')">Знаю только месяц</button>
+            <button class="btn btn-light" onclick="approxAge('season')">Знаю только время года</button>
+            <button class="btn btn-light" onclick="approxAge('unknown')">Вообще не знаю</button>
+            <div class="modal-actions">
+                <button class="btn btn-light" onclick="closeApproxAgeModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- МОДАЛКА ВЫБОРА ВРЕМЕНИ ГОДА -->
+    <div id="seasonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-top">
+                <h3>Выберите время года</h3>
+                <button class="icon-btn" onclick="closeSeasonModal()">✕</button>
+            </div>
+            <button class="btn btn-light" onclick="setSeason(3, 'Весна')">🌸 Весна (март)</button>
+            <button class="btn btn-light" onclick="setSeason(6, 'Лето')">☀️ Лето (июнь)</button>
+            <button class="btn btn-light" onclick="setSeason(9, 'Осень')">🍂 Осень (сентябрь)</button>
+            <button class="btn btn-light" onclick="setSeason(12, 'Зима')">❄️ Зима (декабрь)</button>
+        </div>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
