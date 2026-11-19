@@ -8,39 +8,67 @@
 <body>
 <div class="app app-fullheight">
     <aside class="sidebar">
-        <h2>🐾 Трекер питомца</h2>
+        <h2> Трекер питомца</h2>
         <nav class="menu">
             <a class="active" href="index.html">Главная</a>
             <a href="pets.html">Питомцы</a>
             <a href="calendar.html">Календарь</a>
-            <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;"> Подсказки</a>
             <a href="about.html">О программе</a>
         </nav>
         <div class="theme-switcher" data-tour="themeSwitcher">
             <button class="btn btn-light theme-btn" onclick="toggleTheme()">
-                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+                <span id="themeIcon"></span> <span id="themeLabel">Тёмная тема</span>
             </button>
         </div>
     </aside>
     <main class="content">
         <section class="hero panel" data-tour="hero">
             <div>
-                <h1>Главная</h1>
-                <p>Ближайшие события и список питомцев.</p>
+                <h1>Добрый день! </h1>
+                <p>Обзор здоровья ваших питомцев и расписание на сегодня.</p>
+            </div>
+            <div class="hero-actions">
+                <button class="btn" onclick="openAddPetPage()">+ Питомец</button>
+                <a href="calendar.html" class="btn btn-light">+ Событие</a>
             </div>
         </section>
-        <div class="main-grid">
-            <section class="panel" data-tour="petsSection">
-                <div class="section-head"><h2>Питомцы</h2></div>
+
+        <!-- Бенто-сетка в стиле шаблонов -->
+        <div class="bento-dashboard">
+            <!-- Левая широкая колонка: Питомцы -->
+            <section class="panel bento-pets" data-tour="petsSection">
+                <div class="section-head">
+                    <h2>Мои питомцы</h2>
+                    <a href="pets.html" class="small-link">Все питомцы →</a>
+                </div>
                 <div id="petsGrid" class="pets-grid" data-compact="true" data-tour="petsGrid"></div>
             </section>
-            <section class="panel" data-tour="upcoming">
-                <div class="section-head"><h2>Ближайшие события</h2></div>
-                <div id="upcomingEvents" class="stack"></div>
-                <a href="calendar.html" class="btn btn-light" style="width:100%; text-align:center; margin-top:12px; display:block;">Все события в календаре →</a>
-            </section>
+
+            <!-- Правая колонка: Мини-календарь + Ближайшие события -->
+            <div class="bento-side">
+            <section class="panel mini-cal-panel">
+                    <div class="section-head">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button class="icon-btn" onclick="changeMiniMonth(-1)" title="Предыдущий месяц">◀</button>
+                            <h2 id="miniCalTitle">Календарь</h2>
+                            <button class="icon-btn" onclick="changeMiniMonth(1)" title="Следующий месяц">▶</button>
+                        </div>
+                        <a href="calendar.html" class="small-link">Открыть →</a>
+                    </div>
+                    <div id="miniCalendar" class="mini-calendar"></div>
+                </section>
+
+                <section class="panel" data-tour="upcoming">
+                    <div class="section-head">
+                        <h2>Ближайшие события</h2>
+                    </div>
+                    <div id="upcomingEvents" class="stack"></div>
+                </section>
+            </div>
         </div>
     </main>
+
 </div>
 <script src="script.js"></script>
 </body>
