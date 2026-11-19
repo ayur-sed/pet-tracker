@@ -9,70 +9,86 @@
 <body>
 <div class="app">
     <aside class="sidebar">
-        <h2>🐾 Трекер питомца</h2>
+        <h2>Трекер питомца</h2>
         <nav class="menu">
-    <a href="index.html">Главная</a>
-    <a class="active" href="pets.html">Питомцы</a> <!-- или profile.html -->
-    <a href="calendar.html">Календарь</a>
-    <a href="#" class="tour-trigger" onclick="startTour(); return false;">💡 Подсказки</a>
-    <a href="about.html">О программе</a>
-</nav>
+            <a href="index.html">Главная</a>
+            <a class="active" href="pets.html">Питомцы</a>
+            <a href="calendar.html">Календарь</a>
+            <a href="#" class="tour-trigger" onclick="startTour(); return false;">Подсказки</a>
+            <a href="about.html">О программе</a>
+        </nav>
         <div class="theme-switcher" data-tour="themeSwitcher">
             <button class="btn btn-light theme-btn" onclick="toggleTheme()">
-                <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+                <span id="themeIcon"></span> <span id="themeLabel">Тёмная тема</span>
             </button>
         </div>
     </aside>
+
     <main class="content">
-        <section id="profileCard" data-tour="profileCard"></section>
-        <section class="panel measurement-panel" data-tour="measurement">
-            <h2>Как измерять питомца</h2>
-            <div class="measurement-grid">
-                <div class="measurement-card">
-                    <h3>Рост питомца</h3>
-                    <p>Измеряется от пола до верхней точки холки. Питомец должен стоять ровно.</p>
-                </div>
-                <div class="measurement-card">
-                    <h3><span class="tooltip" data-tip="Body Condition Score — система оценки упитанности от 1 (истощение) до 9 (ожирение). Идеальная норма = 5.">BCS</span> — Body Condition Score</h3>
-                    <p>Оцени рёбра, талию и живот. При норме (5) рёбра прощупываются, но не видны, талия выражена.</p>
-                    <p style="font-size:12px; color:var(--muted); margin-top:8px; border-top:1px solid #dbeafe; padding-top:8px;">
-                        <i>Источник: WSAVA Global Nutrition Guidelines</i>
-                    </p>
-                </div>
-                <div class="measurement-card">
-                    <h3>Тип телосложения</h3>
-                    <p>Лёгкое — худощавое. Среднее — стандарт. Крупное — массивное. Коротколапое — удлинённое тело на коротких лапах.</p>
-                </div>
+        <div class="profile-bento">
+            <!-- Левая колонка: компактная карточка питомца -->
+            <div class="profile-bento-left">
+                <section id="profileCard" data-tour="profileCard"></section>
+
+                <details class="panel measurement-panel" data-tour="measurement">
+                    <summary class="measurement-summary">Как правильно измерять питомца</summary>
+                    <div class="measurement-grid-compact">
+                        <div class="measurement-card">
+                            <h4>Рост в холке</h4>
+                            <p>От пола до верхней точки между лопатками, когда питомец стоит ровно.</p>
+                        </div>
+                        <div class="measurement-card">
+                            <h4><span class="tooltip" data-tip="Body Condition Score — шкала упитанности от 1 до 9. Норма = 5.">BCS</span> (упитанность)</h4>
+                            <p>В норме (5) рёбра легко прощупываются, но не торчат, сверху видна талия.</p>
+                            <small class="muted-source">Источник: WSAVA Global Nutrition Guidelines</small>
+                        </div>
+                        <div class="measurement-card">
+                            <h4>Телосложение</h4>
+                            <p>Лёгкое — худощавое; среднее — стандарт; крупное — массивное; коротколапое — вытянутое тело.</p>
+                        </div>
+                    </div>
+                </details>
             </div>
-        </section>
-        <section class="panel" data-tour="weightChart">
-            <h2>График веса</h2>
-            <canvas id="weightChart" height="50"></canvas>
-        </section>
-        <section class="panel" data-tour="heightChart" id="heightChartSection" style="display:none;">
-            <h2>График роста</h2>
-            <canvas id="heightChart" height="50"></canvas>
-        </section>
-        <section class="panel" data-tour="weightHistory">
-            <div class="section-head">
-                <h2>История веса</h2>
-                <button class="btn" onclick="openWeightModal()">+ Добавить вес</button>
+
+            <!-- Правая колонка: графики и история сразу на виду -->
+            <div class="profile-bento-right">
+                <section class="panel" data-tour="weightChart">
+                    <div class="section-head">
+                        <h2>Динамика веса</h2>
+                        <button class="btn" onclick="openWeightModal()">+ Добавить вес</button>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="panel" data-tour="weightHistory">
+                    <div class="section-head">
+                        <h2>История взвешиваний</h2>
+                        <span class="small">Взвешивайте утром до кормления</span>
+                    </div>
+                    <ul id="weightList" class="record-list"></ul>
+                </section>
+
+                <section class="panel" data-tour="heightChart" id="heightChartSection" style="display:none;">
+                    <div class="section-head">
+                        <h2>Динамика роста</h2>
+                        <button class="btn" onclick="openHeightModal()">+ Добавить рост</button>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="heightChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="panel" data-tour="heightHistory" id="heightHistorySection" style="display:none;">
+                    <h2>История роста</h2>
+                    <ul id="heightList" class="record-list"></ul>
+                </section>
             </div>
-            <div class="hint-box">
-                💡 <b>Как взвешивать:</b> ставь питомца на весы в одно и то же время, желательно утром до кормления.
-            </div>
-            <ul id="weightList" class="record-list"></ul>
-        </section>
-        <section class="panel" data-tour="heightHistory" id="heightHistorySection" style="display:none;">
-            <div class="section-head">
-                <h2>История роста</h2>
-                <button class="btn" onclick="openHeightModal()">+ Добавить рост</button>
-            </div>
-            <ul id="heightList" class="record-list"></ul>
-        </section>
+        </div>
     </main>
 
-    <!-- МОДАЛКА ВЕСА -->
+    <!-- Модалка веса -->
     <div id="weightModal" class="modal">
         <div class="modal-content">
             <div class="modal-top">
@@ -82,14 +98,15 @@
             <input type="hidden" id="weightIndex">
             <input id="weightDate" type="date">
             <input id="weightValue" type="number" min="0" step="0.1" placeholder="Вес, кг">
-            <div class="hint-inline">Вводи вес в килограммах, например: 4.2</div>
+            <div class="hint-inline">Например: 4.2</div>
             <div class="modal-actions">
                 <button class="btn" onclick="saveWeight()">Сохранить</button>
                 <button class="btn btn-light" onclick="closeWeightModal()">Отмена</button>
             </div>
         </div>
     </div>
-    <!-- МОДАЛКА РОСТА -->
+
+    <!-- Модалка роста -->
     <div id="heightModal" class="modal">
         <div class="modal-content">
             <div class="modal-top">
@@ -99,39 +116,11 @@
             <input type="hidden" id="heightIndex">
             <input id="heightDate" type="date">
             <input id="heightValue" type="number" min="0" step="0.1" placeholder="Рост, см">
-            <div class="hint-inline">Вводи рост в сантиметрах, например: 25.5</div>
+            <div class="hint-inline">Например: 25.5</div>
             <div class="modal-actions">
                 <button class="btn" onclick="saveHeight()">Сохранить</button>
                 <button class="btn btn-light" onclick="closeHeightModal()">Отмена</button>
             </div>
-        </div>
-    </div>
-    <div id="approxAgeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-top">
-                <h3>Примерный возраст</h3>
-                <button class="icon-btn" onclick="closeApproxAgeModal()">✕</button>
-            </div>
-            <p class="small">Выберите, что вы знаете о дате рождения:</p>
-            <button class="btn btn-light" onclick="approxAge('day')">Знаю точный день, но не уверен в годе</button>
-            <button class="btn btn-light" onclick="approxAge('month')">Знаю только месяц</button>
-            <button class="btn btn-light" onclick="approxAge('season')">Знаю только время года</button>
-            <button class="btn btn-light" onclick="approxAge('unknown')">Вообще не знаю</button>
-            <div class="modal-actions">
-                <button class="btn btn-light" onclick="closeApproxAgeModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
-    <div id="seasonModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-top">
-                <h3>Выберите время года</h3>
-                <button class="icon-btn" onclick="closeSeasonModal()">✕</button>
-            </div>
-            <button class="btn btn-light" onclick="setSeason(3, 'Весна')">🌸 Весна (март)</button>
-            <button class="btn btn-light" onclick="setSeason(6, 'Лето')">☀️ Лето (июнь)</button>
-            <button class="btn btn-light" onclick="setSeason(9, 'Осень')">🍂 Осень (сентябрь)</button>
-            <button class="btn btn-light" onclick="setSeason(12, 'Зима')">❄️ Зима (декабрь)</button>
         </div>
     </div>
 </div>
