@@ -84,6 +84,25 @@
                     <h2>История роста</h2>
                     <ul id="heightList" class="record-list"></ul>
                 </section>
+                <section class="panel" data-tour="chestChart">
+                    <div class="section-head">
+                        <h2> Динамика промеров </h2>
+                        <button class="btn" onclick="openMeasureModal()">+ Добавить промер </button>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="chestChart"></canvas>
+                    </div>
+                    </section>
+
+                    <section class="panel" data-tour="measureHistory">
+                    <div class="section-head">
+                        <h2> История промеров </h2>
+                        <span class="small">Обхват груди и длина туловища</span>
+                    </div>
+                    <ul id="measureList" class="record-list"></ul>
+                    </section>
+
+
             </div>
         </div>
     </main>
@@ -123,7 +142,29 @@
             </div>
         </div>
     </div>
+    <!-- Модалка промеров -->
+        <div id="measureModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-top">
+            <h3 id="measureModalTitle">Добавить промер</h3>
+            <button class="icon-btn" onclick="closeMeasureModal()"> ✕ </button>
+            </div>
+            <input type="hidden" id="measureIndex">
+            <label class="form-label"> Дата </label>
+            <input id="measureDate" type="date">
+            <label class="form-label"> Обхват груди за лопатками (см) </label>
+            <input id="measureChest" type="number" min="0" step="0.5" placeholder=" Например: 65 ">
+            <label class="form-label"> Длина туловища (см) </label>
+            <input id="measureLength" type="number" min="0" step="0.5" placeholder=" От холки до корня хвоста ">
+            <div class="modal-actions">
+            <button class="btn" onclick="saveMeasure()"> Сохранить </button>
+            <button class="btn btn-light" onclick="closeMeasureModal()"> Отмена </button>
+            </div>
+        </div>
+        </div>
+
 </div>
+<script src="livestock.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
