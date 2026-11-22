@@ -589,23 +589,33 @@ display: grid; gap: 10px; border: 2px solid var(--c-sage);
 .tour-tooltip-actions { display: flex; justify-content: space-between; }
 /* Адаптив */
 @media (max-width: 1050px) {
-.app { flex-direction: column; padding: 10px; }
-.sidebar {
-width: 100%;
-height: auto;
-position: sticky;
-top: 8px;
-z-index: 20;
-padding: 12px;
-border-radius: 20px;
+    .app {
+        flex-direction: column;
+        padding: 10px;
+        align-items: stretch;   
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 8px;
+        z-index: 20;
+        padding: 12px;
+        border-radius: 20px;
+    }
+    .sidebar h2 { margin: 0 0 8px; font-size: 19px; text-align: center; }
+    .menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+    .menu a { padding: 7px 11px; font-size: 13px; }
+    .menu a.tour-trigger { margin-top: 0; }
+    .theme-switcher { margin-top: 8px; padding-top: 8px; }
+    .bento-dashboard, .profile-bento, .form-grid { grid-template-columns: 1fr; }
 }
-.sidebar h2 { margin: 0 0 8px; font-size: 19px; text-align: center; }
-.menu { flex-direction: row; flex-wrap: wrap; gap: 6px; justify-content: center; }
-.menu a { padding: 7px 11px; font-size: 13px; }
-.menu a.tour-trigger { margin-top: 0; }
-.theme-switcher { margin-top: 8px; padding-top: 8px; }
-.bento-dashboard, .profile-bento, .form-grid { grid-template-columns: 1fr; }
-}
+
 /* Печать PDF */
 @media print {
 body { background: #FFFFFF !important; color: #000000 !important; }
