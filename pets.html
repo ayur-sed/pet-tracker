@@ -2,20 +2,20 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Трекер питомца — Главная</title>
+    <title>Трекер питомца — Питомцы</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app app-fullheight">
+<div class="app">
     <aside class="sidebar">
         <h2> Трекер питомца</h2>
         <nav class="menu">
-            <a class="active" href="index.html">Главная</a>
-            <a href="pets.html">Питомцы</a>
-            <a href="calendar.html">Календарь</a>
-            <a href="#" class="tour-trigger" onclick="startTour(); return false;"> Подсказки</a>
-            <a href="about.html">О программе</a>
-        </nav>
+    <a href="index.html">Главная</a>
+    <a class="active" href="pets.html">Питомцы</a> <!-- или profile.html -->
+    <a href="calendar.html">Календарь</a>
+    <a href="#" class="tour-trigger" onclick="startTour(); return false;"> Подсказки</a>
+    <a href="about.html">О программе</a>
+</nav>
         <div class="theme-switcher" data-tour="themeSwitcher">
             <button class="btn btn-light theme-btn" onclick="toggleTheme()">
                 <span id="themeIcon"></span> <span id="themeLabel">Тёмная тема</span>
@@ -25,50 +25,19 @@
     <main class="content">
         <section class="hero panel" data-tour="hero">
             <div>
-                <h1>Добрый день! </h1>
-                <p>Обзор здоровья ваших питомцев и расписание на сегодня.</p>
+                <h1>Питомцы</h1>
+                <p>Добавляй, редактируй и удаляй питомцев.</p>
             </div>
-            <div class="hero-actions">
-                <button class="btn" onclick="openAddPetPage()">+ Питомец</button>
-                <a href="calendar.html" class="btn btn-light">+ Событие</a>
-            </div>
+            <button class="btn" data-tour="addPetBtn" onclick="openPetModal()">+ Добавить питомца</button>
+            <button class="btn" data-tour="exportBtn" onclick="exportData()">Вывести данные</button>
+            <button class="btn" data-tour="importBtn" onclick="document.getElementById('importFile').click()">Загрузить данные</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
         </section>
-
-        <!-- Бенто-сетка в стиле шаблонов -->
-        <div class="bento-dashboard">
-            <!-- Левая широкая колонка: Питомцы -->
-            <section class="panel bento-pets" data-tour="petsSection">
-                <div class="section-head">
-                    <h2>Мои питомцы</h2>
-                    <a href="pets.html" class="small-link">Все питомцы →</a>
-                </div>
-                <div id="petsGrid" class="pets-grid" data-compact="true" data-tour="petsGrid"></div>
-            </section>
-
-            <!-- Правая колонка: Мини-календарь + Ближайшие события -->
-            <div class="bento-side">
-            <section class="panel mini-cal-panel">
-                    <div class="section-head">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="icon-btn" onclick="changeMiniMonth(-1)" title="Предыдущий месяц">◀</button>
-                            <h2 id="miniCalTitle">Календарь</h2>
-                            <button class="icon-btn" onclick="changeMiniMonth(1)" title="Следующий месяц">▶</button>
-                        </div>
-                        <a href="calendar.html" class="small-link">Открыть →</a>
-                    </div>
-                    <div id="miniCalendar" class="mini-calendar"></div>
-                </section>
-
-                <section class="panel" data-tour="upcoming">
-                    <div class="section-head">
-                        <h2>Ближайшие события</h2>
-                    </div>
-                    <div id="upcomingEvents" class="stack"></div>
-                </section>
-            </div>
-        </div>
+        <section class="panel">
+            <div id="petsGrid" class="pets-grid" data-tour="petsGrid"></div>
+        </section>
     </main>
-
+   
 </div>
 <script src="livestock.js"></script>
 <script src="script.js"></script>
