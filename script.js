@@ -1,5 +1,8 @@
-// ===== Глобальные объекты =====
+//  Глобальные объекты 
 let pets = JSON.parse(localStorage.getItem("pets")) || [];
+// Чистка старых записей: убираем пробелы в названии вида
+pets.forEach(p => { if (p.species) p.species = String(p.species).trim(); });
+
 let events = JSON.parse(localStorage.getItem("events")) || [];
 let currentMonthView = new Date().getMonth();
 let currentYearView = new Date().getFullYear();
@@ -11,6 +14,41 @@ const BODY_TYPES = {
     "Собака": ["Лёгкое", "Среднее", "Крупное", "Коротколапое"],
     "Кошка": ["Лёгкое", "Среднее", "Крупное", "Коротколапое"]
 };
+
+// ФОРМУЛЫ ВЕСА ПО ПРОМЕРАМ (Седип А., 2016 + Трухановский) 
+const LIVESTOCK = {
+  "Собака": { formula: (P, L) => P * L / 100 * 1,  err: "проверено автором на своих питомцах" },
+  "Кошка":  { formula: (P, L) => P * L / 100 / 3,  err: "проверено автором, расхождение до 5%" },
+  "КРС":    { formula: (P, L, k) => P * L / 100 * (k || 2), err: "способ Трухановского, ошибка ±20–30 кг" },
+  "Лошадь": { formula: (P) => (6 * P - 620 + 6.4 * P - 689) / 2, err: "формула Моторика, ориентировочно" },
+  "Свинья": { formula: (P, L) => 1.54 * P + 0.99 * L - 150, err: "ошибка ±5–10%" },
+  "Овца":   { formula: (P, L) => P * L / 100 * 0.7, err: "ОРИЕНТИРОВОЧНО: по овцам ошибка до 25–30%, проверьте взвешиванием" },
+  "Коза":   { formula: (P, L) => P * L / 100 * 0.7, err: "ОРИЕНТИРОВОЧНО: ошибка до 25–30%, проверьте взвешиванием" }
+};
+const NEEDS_MEASURES = ["КРС", "Лошадь", "Свинья", "Овца", "Коза"];
+
+// Поправка на упитанность (стыкуется с BCS)
+function bcsFactor(bcs) {
+  if (!bcs) return 1;
+  if (bcs <= 3) return 0.925;   // нижесредняя упитанность: −5–10%
+  if (bcs >= 7) return 1.075;   // вышесредняя: +5–10%
+  return 1;
+}
+
+function estimateByMeasures(pet) {
+ const cfg = LIVESTOCK[(pet.species || "").trim()];
+const P = +pet.chestGirth || 0, L = +pet.bodyLength || 0;
+if (!cfg || !P || !L) return null;
+
+  const m = cfg.formula(P, L, +pet.cattleType) * bcsFactor(pet.bcs);
+  return {
+    weight: Math.round(m * 10) / 10,
+    min: Math.round(m * 0.9 * 10) / 10,   // узкий диапазон ±10%
+    max: Math.round(m * 1.1 * 10) / 10,
+    err: cfg.err
+  };
+}
+
 
 const BODY_TYPE_HINTS = {
     "Собака": {
@@ -159,39 +197,52 @@ function isGrowing(pet) {
 }
 
 function toggleSpeciesFields() {
-    const species = document.getElementById("petSpecies");
-    const bodyType = document.getElementById("petBodyType");
-    const hint = document.getElementById("bodyTypeHint");
-    const speciesHint = document.getElementById("speciesHint");
-    if (!species || !bodyType) return;
-    const value = species.value;
-    bodyType.innerHTML = '<option value="">Тип телосложения</option>';
     
-    if (speciesHint) {
-        if (!value) speciesHint.textContent = "";
-        else if (value === "Собака" || value === "Кошка") speciesHint.textContent = "";
-        else speciesHint.textContent = " Для этого вида расчёт идеального веса пока не реализован. Информация появится в следующих версиях.";
+  const species = document.getElementById("petSpecies");
+  const bodyType = document.getElementById("petBodyType");
+  const hint = document.getElementById("bodyTypeHint");
+  const speciesHint = document.getElementById("speciesHint");
+  if (!species || !bodyType) return;
+
+  const value = (species.value || "").trim();
+
+  // --- Промеры: показываем для фермерских видов, скрываем рост ---
+  const measuresBlock = document.getElementById("measuresBlock");
+  const cattleBlock = document.getElementById("cattleTypeBlock");
+  const heightBlock = document.getElementById("heightBlock");
+  const isFarm = NEEDS_MEASURES.includes(value);
+  if (measuresBlock) measuresBlock.style.display = isFarm ? "block" : "none";
+  if (cattleBlock) cattleBlock.style.display = value === "КРС" ? "block" : "none";
+  if (heightBlock) heightBlock.style.display = isFarm ? "none" : "block";
+
+  if (speciesHint) {
+    if (!value) speciesHint.textContent = "";
+    else if (value === "Собака" || value === "Кошка") speciesHint.textContent = "";
+    else if (isFarm) speciesHint.textContent = "💡 Вес этого вида определяется по промерам: обхват груди P и длина туловища L. Идеальный диапазон сузится до ±10% от расчётной массы.";
+    else speciesHint.textContent = "Для этого вида расчёт идеального веса пока не реализован. Информация появится в следующих версиях.";
+  }
+
+  bodyType.innerHTML = '<option value=""> Тип телосложения </option>';
+  const types = BODY_TYPES[value];
+  if (!types) { if (hint) hint.textContent = ""; return; }
+
+  types.forEach(type => {
+    const option = document.createElement("option");
+    option.value = type;
+    option.textContent = type;
+    bodyType.appendChild(option);
+  });
+
+  bodyType.onchange = () => {
+    if (hint && BODY_TYPE_HINTS[value] && BODY_TYPE_HINTS[value][bodyType.value]) {
+      hint.textContent = "💡 " + BODY_TYPE_HINTS[value][bodyType.value];
+    } else if (hint) {
+      hint.textContent = "";
     }
-    
-    if (!BODY_TYPES[value]) {
-        if (hint) hint.textContent = "";
-        return;
-    }
-    BODY_TYPES[value].forEach(type => {
-        const option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        bodyType.appendChild(option);
-    });
-    bodyType.onchange = () => {
-        if (hint && BODY_TYPE_HINTS[value] && BODY_TYPE_HINTS[value][bodyType.value]) {
-            hint.textContent = "💡 " + BODY_TYPE_HINTS[value][bodyType.value];
-        } else if (hint) {
-            hint.textContent = "";
-        }
-        updateHeightHint();
-    };
+    updateHeightHint();
+  };
 }
+
 
 function updateHeightHint() {
     const hint = document.getElementById("heightHint");
@@ -344,6 +395,13 @@ function getMergedUpcoming() {
 
 // ===== РАСЧЁТ ИДЕАЛЬНОГО ВЕСА =====
 function calculateIdealWeight(pet) {
+    
+    // Промеры важнее общей формулы: узкий диапазон ±10%
+const est = estimateByMeasures(pet);
+if (est && !(isGrowing(pet) && !NEEDS_MEASURES.includes((pet.species || "").trim()))) {
+  return { min: est.min, max: est.max, byMeasures: true, err: est.err, isPuppyKitten: false };
+}
+
     if (pet.species !== "Собака" && pet.species !== "Кошка") {
         return { notSupported: true };
     }
@@ -388,6 +446,18 @@ function getWeightStatus(pet, currentWeight) {
     if (currentWeight < ideal.min) return { className: "weight-low", text: `Недобор веса. Норма: ${ideal.min}–${ideal.max} кг` };
     if (currentWeight > ideal.max) return { className: "weight-high", text: `Избыточный вес. Норма: ${ideal.min}–${ideal.max} кг` };
     return { className: "weight-normal", text: `Вес в норме (${ideal.min}–${ideal.max} кг)` };
+}
+function weightTrend(pet) {
+  if (!pet) return null;
+  const w = getSortedWeights(pet);
+  if (w.length < 2) return null;
+  const days = (parseDate(w[w.length - 1].date) - parseDate(w[0].date)) / 86400000;
+  if (days < 1) return null;
+  const gain = w[w.length - 1].value - w[0].value;
+  const perDay = gain / days;
+  if (perDay > 0.005)  return { text: `📈 Набирает вес: +${gain.toFixed(1)} кг за ${Math.round(days)} дн.` };
+  if (perDay < -0.005) return { text: `📉 Снижает вес: ${gain.toFixed(1)} кг за ${Math.round(days)} дн.` };
+  return { text: `⚖️ Вес стабилен (${gain.toFixed(1)} кг за ${Math.round(days)} дн.)` };
 }
 
 // ===== PETS =====
@@ -507,36 +577,80 @@ function cancelAddPet() {
 
 // ===== АНКЕТА (add-pet.html) =====
 function loadPetForm() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isEdit = urlParams.get('edit') === '1';
-    const editIndex = localStorage.getItem("editPetIndex");
-    if (isEdit && editIndex !== null) {
-        const pet = pets[Number(editIndex)];
-        if (!pet) return;
-        document.getElementById("addPetTitle").textContent = "Редактировать питомца";
-        document.getElementById("petIndex").value = editIndex;
-        document.getElementById("petName").value = pet.name || "";
-        document.getElementById("petSpecies").value = pet.species || "";
-        document.getElementById("petGender").value = pet.gender || "";
-        document.getElementById("petBirthDate").value = pet.birthDate || "";
-        document.getElementById("petHousing").value = pet.housing || "";
-        document.getElementById("petNotes").value = pet.notes || "";
-        toggleSpeciesFields();
-        setTimeout(() => {
-            document.getElementById("petBodyType").value = pet.bodyType || "";
-            document.getElementById("petHeight").value = pet.height || "";
-            document.getElementById("petBCS").value = pet.bcs || "";
-            updateHeightHint();
-        }, 0);
-        editingPetPhoto = pet.photo || "";
-        document.getElementById("petPhotoPreview").src = pet.photo || defaultAvatar(pet.name);
-    } else {
-        editingPetPhoto = "";
-        document.getElementById("petPhotoPreview").src = defaultAvatar("Питомец");
+  const $ = id => document.getElementById(id);
+
+  // Режим редактирования: ?edit=1 в адресе + сохранённый индекс
+  const isEdit = new URLSearchParams(window.location.search).get('edit') === '1';
+  const editIndexRaw = localStorage.getItem("editPetIndex");
+
+  // Массив питомцев: берём глобальный pets, если он есть
+  const list = (typeof pets !== "undefined" && Array.isArray(pets)) ? pets : [];
+  const idx = Number(editIndexRaw);
+  const pet = (isEdit && editIndexRaw !== null && list[idx]) ? list[idx] : null;
+
+  // Заголовок и скрытый индекс
+  if ($("addPetTitle")) $("addPetTitle").textContent = pet ? "Редактировать питомца" : "Добавить питомца";
+  if ($("petIndex")) $("petIndex").value = pet ? editIndexRaw : "";
+
+  // Новый питомец — чистая форма, выходим
+  if (!pet) {
+    if (typeof editingPetPhoto !== "undefined") editingPetPhoto = "";
+    if ($("petPhotoPreview")) $("petPhotoPreview").src = defaultAvatar("Питомец");
+    return;
+  }
+
+  // Простые поля
+  if ($("petName"))      $("petName").value = pet.name || "";
+  if ($("petGender"))    $("petGender").value = pet.gender || "";
+  if ($("petBirthDate")) $("petBirthDate").value = pet.birthDate || "";
+  if ($("petHousing"))   $("petHousing").value = pet.housing || "";
+  if ($("petNotes"))     $("petNotes").value = pet.notes || "";
+
+  // Вид — подбираем вариант без учёта пробелов
+  const speciesRaw = (pet.species || "").trim();
+  const sp = $("petSpecies");
+  if (sp) {
+    sp.value = "";
+    for (const opt of sp.options) {
+      if (opt.value.trim() === speciesRaw) { sp.value = opt.value; break; }
     }
+  }
+
+  toggleSpeciesFields();   // раскрываем блоки (промеры, порода КРС) до заполнения
+
+  // Новые поля промеров
+  if ($("petChestGirth")) $("petChestGirth").value = pet.chestGirth || "";
+  if ($("petBodyLength")) $("petBodyLength").value = pet.bodyLength || "";
+  if ($("petCattleType")) $("petCattleType").value = pet.cattleType || "";
+
+  // Тип телосложения — тоже с обрезкой пробелов
+  const bodyRaw = (pet.bodyType || "").trim();
+  const bt = $("petBodyType");
+  if (bt) {
+    bt.value = "";
+    for (const opt of bt.options) {
+      if (opt.value.trim() === bodyRaw) { bt.value = opt.value; break; }
+    }
+  }
+  if ($("petHeight")) $("petHeight").value = pet.height || "";
+  if ($("petBCS"))    $("petBCS").value = pet.bcs || "";
+  if (typeof updateHeightHint === "function") updateHeightHint();
+
+  // Фото
+  if (typeof editingPetPhoto !== "undefined") editingPetPhoto = pet.photo || "";
+  if ($("petPhotoPreview")) $("petPhotoPreview").src = pet.photo || defaultAvatar(pet.name);
 }
 
+
 async function savePet() {
+
+    const chestGirth = parseFloat(document.getElementById("petChestGirth")?.value) || 0;
+const bodyLength = parseFloat(document.getElementById("petBodyLength")?.value) || 0;
+const cattleType = document.getElementById("petCattleType")?.value || "";
+// ... и добавьте в объект data:
+
+
+
     const petIndex = document.getElementById("petIndex"),
         petName = document.getElementById("petName"),
         petSpecies = document.getElementById("petSpecies"),
@@ -549,7 +663,8 @@ async function savePet() {
     const height = parseFloat(document.getElementById("petHeight")?.value) || 0;
     const bcs = Number(document.getElementById("petBCS")?.value) || 0;
     const name = petName.value.trim();
-    const species = petSpecies.value, gender = petGender.value;
+    const species = (petSpecies.value || "").trim(), gender = petGender.value;
+
     const birthDate = petBirthDate.value, housing = petHousing.value;
     const notes = petNotes ? petNotes.value.trim() : "";
     if (!name || !species) {
@@ -558,7 +673,10 @@ async function savePet() {
     if (birthDate && birthDate > todayISO()) { alert("Дата рождения не может быть в будущем."); return; }
     let photo = editingPetPhoto || defaultAvatar(name);
     if (petPhoto.files && petPhoto.files[0]) photo = await fileToDataUrl(petPhoto.files[0]);
-    const data = { name, species, gender, birthDate, housing, photo, bodyType, height, bcs, notes };
+
+    const data = { name, species, gender, birthDate, housing, photo, bodyType, height, bcs, notes,
+               chestGirth, bodyLength, cattleType };
+
     const index = petIndex.value === "" ? null : Number(petIndex.value);
     if (index === null) pets.push({ id: Date.now(), ...data, weights: [], heights: [] });
     else { const ex = pets[index]; pets[index] = { ...ex, ...data, weights: ex.weights || [], heights: ex.heights || [] }; }
@@ -591,6 +709,7 @@ function renderProfile() {
     const pet = index !== null ? petByIndex(index) : null;
     if (pet && !Array.isArray(pet.weights)) pet.weights = [];
     if (pet && !Array.isArray(pet.heights)) pet.heights = [];
+    if (pet && !Array.isArray(pet.measures)) pet.measures = [];
     if (!pet) {
         container.innerHTML = `<section class="panel"><div class="empty-state">Питомец не выбран.</div></section>`;
         return;
@@ -599,6 +718,7 @@ function renderProfile() {
     const latestWeight = sortedWeights.length ? sortedWeights[sortedWeights.length - 1] : null;
     const idealWeight = calculateIdealWeight(pet);
     const weightStatus = latestWeight ? getWeightStatus(pet, latestWeight.value) : null;
+    const trend = weightTrend(pet);
     const petLabel = getPetLabel(pet);
     const growing = isGrowing(pet);
     container.innerHTML = `
@@ -620,6 +740,8 @@ function renderProfile() {
                     <div><b>Последний вес:</b> ${latestWeight ? `${Number(latestWeight.value).toFixed(1)} кг` : "ещё нет"}</div>
                 </div>
                 ${weightStatus ? `<div class="weight-status ${weightStatus.className}">${weightStatus.text}</div>` : ""}
+               ${trend ? `<div class="small" style="margin-top:6px;">${trend.text}</div>` : ""}
+
                 ${idealWeight && !idealWeight.notSupported ? `
                     <table class="weight-table">
                         <tr><th>Параметр</th><th>Значение</th></tr>
@@ -627,6 +749,7 @@ function renderProfile() {
                             ? `<tr><td colspan="2" style="text-align:center; color:#8E9E83; font-weight:700;"> Питомец растёт! Вес оценивается индивидуально у ветеринара.</td></tr>`
                             : `<tr><td>Идеальный вес</td><td>${idealWeight.min} – ${idealWeight.max} кг</td></tr>`
                         }
+                        
                         <tr><td>Рост</td><td>${pet.height || "—"} см</td></tr>
                         <tr><td>BCS</td><td>${pet.bcs || "—"}</td></tr>
                     </table>` : ""}
@@ -651,6 +774,9 @@ function renderProfile() {
     renderHeightList();
     drawWeightChart();
     drawHeightChart();
+    renderMeasureList();
+drawChestChart();
+
 }
 
 function editCurrentPet() { const i = currentPetIndex(); if (i !== null) openAddPetPage(i); }
@@ -801,6 +927,131 @@ function renderHeightList() {
             </div>
         </li>`).join("");
 }
+
+// ===== ПРОМЕРЫ (обхват груди P и длина туловища L) =====
+
+let chestChartInstance = null;
+
+function getSortedMeasures(pet) {
+  const list = Array.isArray(pet.measures) ? [...pet.measures] : [];
+  return list.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function openMeasureModal(index = null) {
+  const modal = document.getElementById("measureModal"); if (!modal) return;
+  const petIndex = currentPetIndex();
+  if (petIndex === null || !pets[petIndex]) { alert("Сначала открой профиль питомца."); return; }
+  const mi = document.getElementById("measureIndex"),
+        md = document.getElementById("measureDate"),
+        mc = document.getElementById("measureChest"),
+        ml = document.getElementById("measureLength");
+  if (index === null) {
+    mi.value = ""; md.value = todayISO(); mc.value = ""; ml.value = "";
+    document.getElementById("measureModalTitle").textContent = "Добавить промер";
+  } else {
+    const r = pets[petIndex].measures[index];
+    mi.value = String(index); md.value = r.date; mc.value = r.chest; ml.value = r.length;
+    document.getElementById("measureModalTitle").textContent = "Редактировать промер";
+  }
+  modal.style.display = "flex";
+}
+
+function closeMeasureModal() {
+  const m = document.getElementById("measureModal");
+  if (m) m.style.display = "none";
+}
+
+function saveMeasure() {
+  const petIndex = currentPetIndex();
+  if (petIndex === null || !pets[petIndex]) return;
+  const date = document.getElementById("measureDate").value;
+  const chest = parseFloat(document.getElementById("measureChest").value);
+  const length = parseFloat(document.getElementById("measureLength").value);
+  if (!date) { alert("Выбери дату."); return; }
+  if (isNaN(chest) || chest <= 0) { alert("Обхват груди должен быть числом больше 0."); return; }
+  if (isNaN(length) || length <= 0) { alert("Длина туловища должна быть числом больше 0."); return; }
+  const pet = pets[petIndex];
+  pet.measures = Array.isArray(pet.measures) ? pet.measures : [];
+  const record = { id: Date.now() + Math.random(), date,
+                   chest: Number(chest.toFixed(1)), length: Number(length.toFixed(1)) };
+  const index = document.getElementById("measureIndex").value === ""
+    ? null : Number(document.getElementById("measureIndex").value);
+  if (index === null) pet.measures.push(record);
+  else pet.measures[index] = record;
+  saveState(); closeMeasureModal();
+  renderProfile(); renderPets();
+}
+
+function editMeasure(index) { openMeasureModal(index); }
+
+function deleteMeasure(index) {
+  const petIndex = currentPetIndex();
+  if (petIndex === null || !pets[petIndex]) return;
+  if (!confirm("Удалить запись промеров?")) return;
+  pets[petIndex].measures.splice(index, 1);
+  saveState(); renderMeasureList(); drawChestChart(); renderProfile(); renderPets();
+}
+
+function renderMeasureList() {
+  const list = document.getElementById("measureList"); if (!list) return;
+  const petIndex = currentPetIndex();
+  if (petIndex === null || !pets[petIndex]) { list.innerHTML = ""; return; }
+  const pet = pets[petIndex], measures = getSortedMeasures(pet);
+  if (!measures.length) {
+    list.innerHTML = `<li class="empty-state">Промеры пока не внесены.</li>`;
+    return;
+  }
+  list.innerHTML = measures.map((m, idx) => `
+    <li class="record-item">
+      <div>
+        <div><b>${formatDate(m.date)}</b></div>
+        <div class="small">Обхват груди: ${m.chest} см · Длина: ${m.length} см</div>
+      </div>
+      <div class="record-actions">
+        <button class="btn btn-light" onclick="editMeasure(${idx})">Редактировать</button>
+        <button class="btn btn-danger" onclick="deleteMeasure(${idx})">Удалить</button>
+      </div>
+    </li>`).join("");
+}
+
+function drawChestChart() {
+  const canvas = document.getElementById("chestChart");
+  if (!canvas || typeof Chart === "undefined") return;
+  const petIndex = currentPetIndex();
+  if (petIndex === null || !pets[petIndex]) return;
+  const pet = pets[petIndex];
+  const measures = getSortedMeasures(pet);
+  if (!measures.length) {
+    if (chestChartInstance) { chestChartInstance.destroy(); chestChartInstance = null; }
+    return;
+  }
+  const labels = measures.map(m => formatDate(m.date));
+  const datasets = [
+    {
+      label: "Обхват груди (см)",
+      data: measures.map(m => m.chest),
+      borderWidth: 3, tension: 0.35, fill: false,
+      borderColor: "#5E7892", backgroundColor: "#5E7892", pointRadius: 4
+    },
+    {
+      label: "Длина туловища (см)",
+      data: measures.map(m => m.length),
+      borderWidth: 3, tension: 0.35, fill: false,
+      borderColor: "#8E9E83", backgroundColor: "#8E9E83", pointRadius: 4
+    }
+  ];
+  if (chestChartInstance) chestChartInstance.destroy();
+  chestChartInstance = new Chart(canvas, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: false } }
+    }
+  });
+}
+
 
 // ===== ГРАФИКИ В НОВОЙ ПАЛИТРЕ =====
 function drawWeightChart() {
@@ -1471,7 +1722,12 @@ window.openProfile = openProfile; window.exportProfilePDF = exportProfilePDF;
 window.editCurrentPet = editCurrentPet; window.deleteCurrentPet = deleteCurrentPet;
 window.openWeightModal = openWeightModal; window.closeWeightModal = closeWeightModal;
 window.saveWeight = saveWeight; window.editWeight = editWeight; window.deleteWeight = deleteWeight;
-window.openHeightModal = openHeightModal; window.closeHeightModal = closeHeightModal;
+window.openHeightModal = openHeightModal; window.openMeasureModal = openMeasureModal;
+window.closeMeasureModal = closeMeasureModal;
+window.saveMeasure = saveMeasure;
+window.editMeasure = editMeasure;
+window.deleteMeasure = deleteMeasure;
+ window.closeHeightModal = closeHeightModal;
 window.saveHeight = saveHeight; window.editHeight = editHeight; window.deleteHeight = deleteHeight;
 window.openEventModal = openEventModal; window.closeEventModal = closeEventModal;
 window.saveEvent = saveEvent;
