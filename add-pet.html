@@ -38,9 +38,14 @@
                     
                     <label class="form-label">Вид животного</label>
                     <select id="petSpecies" onchange="toggleSpeciesFields()">
-                        <option value="">Выбери вид</option>
-                        <option value="Собака">Собака</option>
-                        <option value="Кошка">Кошка</option>
+                        <option value=""> Выбери вид </option>
+                        <option value="Собака"> Собака </option>
+                        <option value="Кошка"> Кошка </option>
+                        <option value="КРС"> КРС (корова, бык) </option>
+                        <option value="Лошадь"> Лошадь </option>
+                        <option value="Свинья"> Свинья </option>
+                        <option value="Овца"> Овца </option>
+                        <option value="Коза"> Коза </option>
                         <option value="Другое">Другое (пока без расчёта веса)</option>
                     </select>
                     <div class="hint-inline" id="speciesHint"></div>
@@ -51,13 +56,34 @@
                     </select>
                     <div class="hint-inline" id="bodyTypeHint"></div>
                     
-                    <label class="form-label">Рост в холке (см)</label>
+                   <div id="heightBlock">
+                    <label class="form-label"> Рост в холке (см) </label>
                     <div class="height-row">
                         <input id="petHeight" type="number" min="0" step="0.1" placeholder="Например: 35">
-                        <button class="btn btn-light" type="button" onclick="askHeightLater()">Не знаю</button>
+                        <button class="btn btn-light" type="button" onclick="askHeightLater()"> Не знаю </button>
                     </div>
                     <div class="hint-inline" id="heightHint"></div>
-                    
+                </div>
+
+                    <div id="measuresBlock" style="display:none">
+                    <label class="form-label"> Обхват груди за лопатками P (см) </label>
+                    <input id="petChestGirth" type="number" min="1" step="0.5" placeholder="Например: 180">
+                    <div class="hint-inline"> Мерить сантиметровой лентой сразу за лопатками. </div>
+
+                    <label class="form-label"> Прямая длина туловища L (см) </label>
+                    <input id="petBodyLength" type="number" min="1" step="0.5" placeholder="От середины холки до корня хвоста">
+                    <div class="hint-inline"> Вес считается по промерам ориентировочно — уточните взвешиванием. </div>
+
+                    <div id="cattleTypeBlock" style="display:none">
+                        <label class="form-label"> Порода КРС </label>
+                        <select id="petCattleType">
+                        <option value="2"> Молочная (K = 2) — в т.ч. тувинские коровы </option>
+                        <option value="2.5"> Молочно-мясная и мясная (K = 2,5) </option>
+                        </select>
+                    </div>
+                    </div>
+
+
                     <label class="form-label">BCS — индекс кондиции</label>
                     <select id="petBCS">
                         <option value="">Выбери BCS</option>
@@ -145,6 +171,7 @@
         </div>
     </div>
 </div>
+<script src="livestock.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
